@@ -1,0 +1,3 @@
+../Core/Src/oled.c:8:6:displayInit	8	static
+../Core/Src/oled.c:12:6:displayUpdate	8	static
+../Core/Src/oled.c:16:6:displayWrite	16	static

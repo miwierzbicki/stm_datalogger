@@ -1,0 +1,6 @@
+../Core/Src/encoder.c:15:6:encSetRange	16	static
+../Core/Src/encoder.c:19:6:encSetPos	16	static
+../Core/Src/encoder.c:23:10:encoderGet	4	static
+../Core/Src/encoder.c:27:6:encoderInit	16	static
+../Core/Src/encoder.c:31:6:entrySelected	16	static
+../Core/Src/encoder.c:38:6:entryClicked	16	static

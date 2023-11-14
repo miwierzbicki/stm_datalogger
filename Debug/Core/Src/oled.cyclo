@@ -1,0 +1,3 @@
+../Core/Src/oled.c:8:6:displayInit	1
+../Core/Src/oled.c:12:6:displayUpdate	1
+../Core/Src/oled.c:16:6:displayWrite	1
