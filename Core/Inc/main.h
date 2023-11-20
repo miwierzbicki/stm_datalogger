@@ -32,6 +32,7 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdbool.h>
+#include "ds18b20.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

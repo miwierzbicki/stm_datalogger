@@ -6,21 +6,26 @@
 #include "ssd1306.h"
 #include "oled.h"
 #include "encoder.h"
+#include "ds18b20.h"
+
 uint16_t encoderMin;
 uint16_t encoderMax;
 Screen screen = MAIN_MENU; //instancja enuma Screen, aktualny stan menu
 int sensorAdcExt=0;
+UART_HandleTypeDef *huart6_new;
+
+void huart_ds_init(UART_HandleTypeDef *huart6) {
+	huart6_new=huart6;
+}
 
 void backButton(uint8_t back_pos, uint8_t target_screen, uint16_t encoder_pos) {
 	ssd1306_SetCursor(0, 56);
 	ssd1306_WriteString("COFNIJ", Font_6x8, entrySelected(back_pos) ? Black : White);
-
 	if(entryClicked(back_pos)) {
 		encSetPos(0);
 		screen = target_screen;
 	}
 }
-
 
 void listAllItemsFromMenu(Menu *menu) {
 	for (int i = 0; i < menu->entry_count; ++i) { //-> bo entry_count na stercie cpu jest (heap)
@@ -31,12 +36,17 @@ void listAllItemsFromMenu(Menu *menu) {
 			}
 			ssd1306_WriteString(menu->entries[i].entry_string, Font_6x8, entrySelected(i) ? Black : White);
 		  }
-
 }
 
 void drawMainMenu(Menu *menu) {
-	encSetRange(0, 2);
+	encSetRange(0, 39);
 	listAllItemsFromMenu(menu);
+	uint32_t encVal = encoderGet();
+	char charArVal[4];
+	sprintf(charArVal, "%lu", encVal);
+	ssd1306_SetCursor(0, 30);
+	ssd1306_WriteString(charArVal, Font_16x24, White);
+
 }
 
 void drawSensorConfig(Menu *menu) {
@@ -47,17 +57,38 @@ void drawSensorConfig(Menu *menu) {
 
 void drawSdConfig(Menu *menu) {
 	encSetRange(0, 1);
+
 	listAllItemsFromMenu(menu);
 	backButton(0, MAIN_MENU, 0);
 }
 
 void drawOnoffMeasure(Menu *menu) {
-	/*for (int i = 0; i < menu->entry_count; ++i) {
-			ssd1306_SetCursor(0, i*8);
-		    displayWrite(menu->entries[i].entry_string);
-		  }
-		displayUpdate();*/
-	listAllItemsFromMenu(menu);
+	//listAllItemsFromMenu(menu);
+	encSetRange(0, 1);
+	wire_reset();
+	wire_write(0xcc);
+	wire_write(0x44);
+	HAL_Delay(95);
+	wire_reset();
+	wire_write(0xcc);
+	wire_write(0xbe);
+	int i;
+	uint8_t rom_code[9];
+	for (i = 0; i < 9; i++)
+	  rom_code[i] = wire_read();
+	char znak[20];
+	float temp= ((rom_code[1]<<8) | (rom_code[0]));
+
+	char tempStr[10];
+	//memcpy(&temp, &rom_code[0], sizeof(temp));
+	temp = temp/16.0f;
+
+	ssd1306_SetCursor(0, 0);
+	ssd1306_WriteString("ds18b20_1 value:", Font_7x10, White);
+	ssd1306_SetCursor(0, 12);
+	sprintf(tempStr, "%f\n\r", temp);
+	ssd1306_WriteString(tempStr, Font_16x24, White);
+	HAL_UART_Transmit(huart6_new, tempStr, strlen(tempStr), HAL_MAX_DELAY);
 	backButton(1, MAIN_MENU, 1);
 }
 
@@ -146,7 +177,7 @@ void displayMenu(void) {
 
 	menu[screen].function(&menu[screen]);
 	ssd1306_UpdateScreen();
-	clearEncButton();
+	//clearEncButton();
 	HAL_Delay(1);
 
 }

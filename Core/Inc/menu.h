@@ -1,5 +1,16 @@
 #ifndef __menu_h
 #define __menu_h
+#include <stdio.h>
+#include "ssd1306_conf.h"
+#include "ssd1306_fonts.h"
+#include "ssd1306_tests.h"
+#include "ssd1306.h"
+#include "oled.h"
+#include "menu.h"
+#include "main.h"
+#include <string.h>
+#include <stdbool.h>
+#include "encoder.h"
 
 typedef enum {
 	MAIN_MENU = 0,
@@ -24,6 +35,7 @@ typedef enum {
 }Screen;
 
 
+void huart_ds_init(UART_HandleTypeDef *huart6);
 
 typedef struct MenuEntry {
    Screen entry;

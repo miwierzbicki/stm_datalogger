@@ -1,0 +1,7 @@
+../Core/Src/ds18b20.c:15:6:ds18_init	16	static
+../Core/Src/ds18b20.c:19:6:delay_us	16	static
+../Core/Src/ds18b20.c:28:19:wire_reset	16	static
+../Core/Src/ds18b20.c:45:6:write_bit	16	static
+../Core/Src/ds18b20.c:61:5:read_bit	16	static
+../Core/Src/ds18b20.c:73:6:wire_write	24	static
+../Core/Src/ds18b20.c:82:9:wire_read	16	static

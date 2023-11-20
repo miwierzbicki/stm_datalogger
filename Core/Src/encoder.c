@@ -12,6 +12,7 @@
 
 TIM_HandleTypeDef *htim1_new;
 
+
 void encSetRange(uint16_t min, uint16_t max) {
 	__HAL_TIM_SET_AUTORELOAD(htim1_new, max);
 }
