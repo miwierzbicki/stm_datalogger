@@ -1,7 +1,8 @@
-../Core/Src/ds18b20.c:15:6:ds18_init	16	static
-../Core/Src/ds18b20.c:19:6:delay_us	16	static
-../Core/Src/ds18b20.c:28:19:wire_reset	16	static
-../Core/Src/ds18b20.c:45:6:write_bit	16	static
-../Core/Src/ds18b20.c:61:5:read_bit	16	static
-../Core/Src/ds18b20.c:73:6:wire_write	24	static
-../Core/Src/ds18b20.c:82:9:wire_read	16	static
+../Core/Src/ds18b20.c:17:6:ds18_init	16	static
+../Core/Src/ds18b20.c:21:7:ds18_get_temp	32	static
+../Core/Src/ds18b20.c:39:6:delay_us	16	static
+../Core/Src/ds18b20.c:45:19:wire_reset	16	static
+../Core/Src/ds18b20.c:62:6:write_bit	16	static
+../Core/Src/ds18b20.c:78:5:read_bit	16	static
+../Core/Src/ds18b20.c:90:6:wire_write	24	static
+../Core/Src/ds18b20.c:99:9:wire_read	16	static

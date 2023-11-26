@@ -1,0 +1,7 @@
+../Core/Src/sd.c:31:6:sd_demount	8	static
+../Core/Src/sd.c:35:6:sd_init	8	static
+../Core/Src/sd.c:48:10:sd_freespace	8	static
+../Core/Src/sd.c:59:10:sd_totalspace	8	static
+../Core/Src/sd.c:70:6:sd_readfile	8	static
+../Core/Src/sd.c:85:6:sd_writefile	8	static
+../Core/Src/sd.c:94:6:sd_closefile	8	static

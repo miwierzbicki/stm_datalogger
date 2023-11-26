@@ -4,9 +4,10 @@
 ../Core/Src/menu.c:41:6:drawMainMenu	1
 ../Core/Src/menu.c:52:6:drawSensorConfig	1
 ../Core/Src/menu.c:58:6:drawSdConfig	1
-../Core/Src/menu.c:65:6:drawOnoffMeasure	2
-../Core/Src/menu.c:96:6:drawSensorConfigAdcExt	1
-../Core/Src/menu.c:106:6:drawSensorConfigAdcInt	1
-../Core/Src/menu.c:110:6:drawSensorConfigDS18	1
-../Core/Src/menu.c:115:6:drawSensorConfigGeneric	1
-../Core/Src/menu.c:175:6:displayMenu	1
+../Core/Src/menu.c:65:6:drawOnoffMeasure	1
+../Core/Src/menu.c:80:6:drawSensorConfigAdcExt	1
+../Core/Src/menu.c:90:6:drawSensorConfigAdcInt	1
+../Core/Src/menu.c:94:6:drawSensorConfigDS18	1
+../Core/Src/menu.c:119:6:drawInterruptTimes	1
+../Core/Src/menu.c:127:6:drawSensorConfigGeneric	23
+../Core/Src/menu.c:273:6:displayMenu	1

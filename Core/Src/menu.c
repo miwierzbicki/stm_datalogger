@@ -10,7 +10,7 @@
 
 uint16_t encoderMin;
 uint16_t encoderMax;
-Screen screen = MAIN_MENU; //instancja enuma Screen, aktualny stan menu
+volatile Screen screen = MAIN_MENU; //instancja enuma Screen, aktualny stan menu
 int sensorAdcExt=0;
 UART_HandleTypeDef *huart6_new;
 
@@ -65,28 +65,12 @@ void drawSdConfig(Menu *menu) {
 void drawOnoffMeasure(Menu *menu) {
 	//listAllItemsFromMenu(menu);
 	encSetRange(0, 1);
-	wire_reset();
-	wire_write(0xcc);
-	wire_write(0x44);
-	HAL_Delay(95);
-	wire_reset();
-	wire_write(0xcc);
-	wire_write(0xbe);
-	int i;
-	uint8_t rom_code[9];
-	for (i = 0; i < 9; i++)
-	  rom_code[i] = wire_read();
-	char znak[20];
-	float temp= ((rom_code[1]<<8) | (rom_code[0]));
-
+	float temp = ds18_get_temp();
 	char tempStr[10];
-	//memcpy(&temp, &rom_code[0], sizeof(temp));
-	temp = temp/16.0f;
-
 	ssd1306_SetCursor(0, 0);
 	ssd1306_WriteString("ds18b20_1 value:", Font_7x10, White);
 	ssd1306_SetCursor(0, 12);
-	sprintf(tempStr, "%f\n\r", temp);
+	sprintf(tempStr, "%f \n\r", temp);
 	ssd1306_WriteString(tempStr, Font_16x24, White);
 	HAL_UART_Transmit(huart6_new, tempStr, strlen(tempStr), HAL_MAX_DELAY);
 	backButton(1, MAIN_MENU, 1);
@@ -112,12 +96,126 @@ void drawSensorConfigDS18(Menu *menu) {
 	backButton(1, MAIN_MENU, 1);
 }
 
+typedef struct {
+	char name[20];
+	bool isEnabled;
+} Sensors;
+
+Sensors sensors[] = {
+
+		{"ADC EXT CH0", false}, //0
+		{"ADC EXT CH1", false}, //1
+		{"ADC EXT CH2", false}, //2
+		{"ADC EXT CH3", false},
+		{"ADC INT CH0", false},
+		{"ADC INT CH1", false}, //5
+		{"ADC INT CH2", false},
+		{"ADC INT CH3", false}, //7
+		{"DS18B20 #1", false}, //8
+		{"DS18B20 #2", false}, //9
+		{"DS18B20 #3", false} //10
+};
+
+void drawInterruptTimes() {
+
+}
+
+int samplingRates[] = {1,2,3,4};
+int sampling1;
+int samplingIndex = 0;
+
 void drawSensorConfigGeneric(Menu *menu) {
-	//tu wartosc z inta tego globalnego (wartosc z enkodera)
-	//na jego podstawie wyprintowac tekst i ustawic jaki czujnik
-	//displayWrite("Edit sensor: ");
-	listAllItemsFromMenu(menu);
-	backButton(1, MAIN_MENU, 1);
+	encSetRange(0, 2);
+	ssd1306_SetCursor(0, 0);
+	if(screen==SENSOR_CONFIG_ADC_EXT0) {
+		ssd1306_WriteString(sensors[0].name, Font_11x18, White);
+		ssd1306_SetCursor(0, 18);
+		char isEnabledStr[20];
+		sprintf(isEnabledStr, "enabled: %s", sensors[0].isEnabled ? "true" : "false");
+		ssd1306_WriteString(isEnabledStr, Font_7x10, entrySelected(0) ? Black : White);
+		ssd1306_SetCursor(0, 28);
+
+		ssd1306_WriteString("period: NULL", Font_7x10, entrySelected(1) ? Black : White);
+	}
+	else if(screen==SENSOR_CONFIG_ADC_EXT1) {
+		ssd1306_WriteString(sensors[1].name, Font_11x18, White);
+		ssd1306_SetCursor(0, 18);
+		char isEnabledStr[20];
+		sprintf(isEnabledStr, "enabled: %s", sensors[1].isEnabled ? "true" : "false");
+		ssd1306_WriteString(isEnabledStr, Font_7x10, White);
+
+	}
+	else if(screen==SENSOR_CONFIG_ADC_EXT2) {
+		ssd1306_WriteString(sensors[2].name, Font_11x18, White);
+		ssd1306_SetCursor(0, 18);
+		char isEnabledStr[20];
+		sprintf(isEnabledStr, "enabled: %s", sensors[2].isEnabled ? "true" : "false");
+		ssd1306_WriteString(isEnabledStr, Font_7x10, White);
+	}
+	else if(screen==SENSOR_CONFIG_ADC_EXT3) {
+		ssd1306_WriteString(sensors[3].name, Font_11x18, White);
+		ssd1306_SetCursor(0, 18);
+		char isEnabledStr[20];
+		sprintf(isEnabledStr, "enabled: %s", sensors[3].isEnabled ? "true" : "false");
+		ssd1306_WriteString(isEnabledStr, Font_7x10, White);
+	}
+	else if(screen==SENSOR_CONFIG_ADC_INT0) {
+		ssd1306_WriteString(sensors[4].name, Font_11x18, White);
+		ssd1306_SetCursor(0, 18);
+		char isEnabledStr[20];
+		sprintf(isEnabledStr, "enabled: %s", sensors[4].isEnabled ? "true" : "false");
+		ssd1306_WriteString(isEnabledStr, Font_7x10, White);
+	}
+	else if(screen==SENSOR_CONFIG_ADC_INT1) {
+		ssd1306_WriteString(sensors[5].name, Font_11x18, White);
+		ssd1306_SetCursor(0, 18);
+		char isEnabledStr[20];
+		sprintf(isEnabledStr, "enabled: %s", sensors[5].isEnabled ? "true" : "false");
+		ssd1306_WriteString(isEnabledStr, Font_7x10, White);
+	}
+	else if(screen==SENSOR_CONFIG_ADC_INT2) {
+		ssd1306_WriteString(sensors[6].name, Font_11x18, White);
+		ssd1306_SetCursor(0, 18);
+		char isEnabledStr[20];
+		sprintf(isEnabledStr, "enabled: %s", sensors[6].isEnabled ? "true" : "false");
+		ssd1306_WriteString(isEnabledStr, Font_7x10, White);
+	}
+	else if(screen==SENSOR_CONFIG_ADC_INT3) {
+		ssd1306_WriteString(sensors[7].name, Font_11x18, White);
+		ssd1306_SetCursor(0, 18);
+		char isEnabledStr[20];
+		sprintf(isEnabledStr, "enabled: %s", sensors[7].isEnabled ? "true" : "false");
+		ssd1306_WriteString(isEnabledStr, Font_7x10, White);
+	}
+	else if(screen==SENSOR_CONFIG_DS18_1) {
+		ssd1306_WriteString(sensors[8].name, Font_11x18, White);
+		ssd1306_SetCursor(0, 18);
+		char isEnabledStr[20];
+		sprintf(isEnabledStr, "enabled: %s", sensors[8].isEnabled ? "true" : "false");
+		ssd1306_WriteString(isEnabledStr, Font_7x10, White);
+	}
+	else if(screen==SENSOR_CONFIG_DS18_2) {
+		ssd1306_WriteString(sensors[9].name, Font_11x18, White);
+		ssd1306_SetCursor(0, 18);
+		char isEnabledStr[20];
+		sprintf(isEnabledStr, "enabled: %s", sensors[9].isEnabled ? "true" : "false");
+		ssd1306_WriteString(isEnabledStr, Font_7x10, White);
+	}
+	else if(screen==SENSOR_CONFIG_DS18_3) {
+		ssd1306_WriteString(sensors[10].name, Font_11x18, White);
+		ssd1306_SetCursor(0, 18);
+		char isEnabledStr[20];
+		sprintf(isEnabledStr, "enabled: %s", sensors[10].isEnabled ? "true" : "false");
+		ssd1306_WriteString(isEnabledStr, Font_7x10, White);
+	}
+	else {
+
+	}
+
+
+	ssd1306_WriteString("", Font_7x10, White);
+
+	backButton(2, MAIN_MENU, 2);
 }
 
 Menu menu[] = {

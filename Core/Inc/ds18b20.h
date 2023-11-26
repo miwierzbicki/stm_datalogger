@@ -10,6 +10,8 @@
 #include <stdbool.h>
 #include "encoder.h"
 
+
+float ds18_get_temp(void);
 void delay_us(uint32_t us);
 void ds18_init(TIM_HandleTypeDef *htim10);
 

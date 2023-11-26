@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "fatfs.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -32,6 +33,10 @@
 #include <stdbool.h>
 #include "encoder.h"
 #include "ds18b20.h"
+#include "string.h"
+#include "main.h"
+#include "sd.h"
+#include "save.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -93,6 +98,11 @@ int8_t ch3przerwanie=0;
 int8_t ch4przerwanie=0;
 
 
+void send_uart(char *string) {
+	uint8_t len = strlen(string);
+	HAL_UART_Transmit(&huart6, (uint8_t *)string, len, HAL_MAX_DELAY);
+}
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if(htim->Instance == TIM11) {
 		HAL_TIM_Base_Stop_IT(htim);
@@ -133,14 +143,14 @@ void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim) {
     }
 }
 
-void DWT_Init(void) //pożyczone z https://github.com/keatis/dwt_delay/blob/master/dwt_delay.c
-{
-    if (!(CoreDebug->DEMCR & CoreDebug_DEMCR_TRCENA_Msk)) {
-        CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-        DWT->CYCCNT = 0;
-        DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
-    }
-}
+//void DWT_Init(void) //pożyczone z https://github.com/keatis/dwt_delay/blob/master/dwt_delay.c
+//{
+//    if (!(CoreDebug->DEMCR & CoreDebug_DEMCR_TRCENA_Msk)) {
+//        CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+//        DWT->CYCCNT = 0;
+//        DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+//    }
+//} //sprawdzic czy nie mozna usunac tego
 
 char charAr[50];
 
@@ -161,6 +171,13 @@ bool isClicked(void) {
 		return false;
 	}
 }
+
+void send_uart_uint32(uint32_t value) {
+    char buffer[20];
+    snprintf(buffer, sizeof(buffer), "%lu \n\r", value);
+    HAL_UART_Transmit(&huart6, (uint8_t *)buffer, strlen(buffer), HAL_MAX_DELAY);
+}
+
 
 
 
@@ -203,8 +220,8 @@ int main(void)
   MX_TIM10_Init();
   MX_TIM11_Init();
   MX_TIM2_Init();
+  MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
-  DWT_Init();
   encoderInit(&htim1);
   ds18_init(&htim10);
   huart_ds_init(&huart6);
@@ -212,7 +229,16 @@ int main(void)
   displayInit();
 
   wire_reset();
+  buff();
+  sd_init();
+  sd_totalspace();
+  sd_freespace();
 
+  sd_writefile();
+  sd_closefile();
+  sd_readfile();
+  sd_closefile();
+  sd_demount();
   bool debug=false;
   /* USER CODE END 2 */
 
@@ -229,40 +255,40 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  if(debug) {
-		  if(ch1przerwanie==1) {
-			  HAL_UART_Transmit(&huart6, (uint8_t *)"ch1 sie wykonal \n\r", strlen("ch1 sie wykonal \n\r"), HAL_MAX_DELAY);
-			  ch1przerwanie=0;
-		  }
-		  if(ch2przerwanie==1) { //castowanie na uint8_t bo funkcja oczekuje wlasnie takiego typu
-			  HAL_UART_Transmit(&huart6, (uint8_t *)"ch2 sie wykonal \n\r", strlen("ch2 sie wykonal \n\r"), HAL_MAX_DELAY);
-			  ch2przerwanie=0;
-		  }
-		  if(ch3przerwanie==1) {
-			  HAL_UART_Transmit(&huart6, (uint8_t *)"ch3 sie wykonal \n\r", strlen("ch3 sie wykonal \n\r"), HAL_MAX_DELAY);
-			  ch3przerwanie=0;
-			  }
-		  if(ch4przerwanie==1) {
-			  HAL_UART_Transmit(&huart6, (uint8_t *)"ch4 sie wykonal \n\r", strlen("ch4 sie wykonal \n\r"), HAL_MAX_DELAY);
-			  ch4przerwanie=0;
-		  }
-	  }
+//	  if(debug) {
+//		  if(ch1przerwanie==1) {
+//			  HAL_UART_Transmit(&huart6, (uint8_t *)"ch1 sie wykonal \n\r", strlen("ch1 sie wykonal \n\r"), HAL_MAX_DELAY);
+//			  ch1przerwanie=0;
+//		  }
+//		  if(ch2przerwanie==1) { //castowanie na uint8_t bo funkcja oczekuje wlasnie takiego typu
+//			  HAL_UART_Transmit(&huart6, (uint8_t *)"ch2 sie wykonal \n\r", strlen("ch2 sie wykonal \n\r"), HAL_MAX_DELAY);
+//			  ch2przerwanie=0;
+//		  }
+//		  if(ch3przerwanie==1) {
+//			  HAL_UART_Transmit(&huart6, (uint8_t *)"ch3 sie wykonal \n\r", strlen("ch3 sie wykonal \n\r"), HAL_MAX_DELAY);
+//			  ch3przerwanie=0;
+//			  }
+//		  if(ch4przerwanie==1) {
+//			  HAL_UART_Transmit(&huart6, (uint8_t *)"ch4 sie wykonal \n\r", strlen("ch4 sie wykonal \n\r"), HAL_MAX_DELAY);
+//			  ch4przerwanie=0;
+//		  }
+//	  }
 
-	  uint32_t valueAdc[2];
-	  HAL_ADC_Start(&hadc1);
-	  HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-	  valueAdc[0] = HAL_ADC_GetValue(&hadc1);
-
-	  HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-	  valueAdc[1] = HAL_ADC_GetValue(&hadc1);
-	  //float voltage = 3.3f * valueAdc / 4096.0f;
-	  int16_t prev_value;
-	  int16_t value= __HAL_TIM_GET_COUNTER(&htim1);
-	  if(value!=prev_value) {
-	  sprintf(charAr, "%d, adc1: %lu, adc2: %lu \n\r", value, valueAdc[0], valueAdc[1]);
-	  HAL_UART_Transmit(&huart6, (uint8_t *)charAr, strlen(charAr), HAL_MAX_DELAY);
-	  prev_value=value;
-	  }
+//	  uint32_t valueAdc[2];
+//	  HAL_ADC_Start(&hadc1);
+//	  HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+//	  valueAdc[0] = HAL_ADC_GetValue(&hadc1);
+//
+//	  HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+//	  valueAdc[1] = HAL_ADC_GetValue(&hadc1);
+//	  //float voltage = 3.3f * valueAdc / 4096.0f;
+//	  int16_t prev_value;
+//	  int16_t value= __HAL_TIM_GET_COUNTER(&htim1);
+//	  if(value!=prev_value) {
+//	  sprintf(charAr, "%d, adc1: %lu, adc2: %lu \n\r", value, valueAdc[0], valueAdc[1]);
+//	  HAL_UART_Transmit(&huart6, (uint8_t *)charAr, strlen(charAr), HAL_MAX_DELAY);
+//	  prev_value=value;
+//	  }
 	displayMenu();
   }
   /* USER CODE END 3 */
@@ -466,7 +492,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -712,6 +738,7 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 

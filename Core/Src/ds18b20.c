@@ -12,15 +12,32 @@
 
 TIM_HandleTypeDef *htim10_new;
 
+
+
 void ds18_init(TIM_HandleTypeDef *htim10) {
 	htim10_new=htim10;
 }
 
+float ds18_get_temp(void) {
+	wire_reset();
+	wire_write(0xcc);
+	wire_write(0x44);
+	HAL_Delay(95);
+	wire_reset();
+	wire_write(0xcc);
+	wire_write(0xbe);
+	int i;
+	uint8_t rom_code[9];
+	for (i = 0; i < 9; i++)
+	  rom_code[i] = wire_read();
+	float temp= ((rom_code[1]<<8) | (rom_code[0]));
+
+
+	return temp = temp/16.0f;
+}
+
 void delay_us(uint32_t us)
 {
-//	uint32_t startTick = DWT->CYCCNT,
-//	delayTicks = us * (SystemCoreClock/1000000);
-//	while (DWT->CYCCNT - startTick < delayTicks);
 	__HAL_TIM_SET_COUNTER(htim10_new, 0);
 	  while (__HAL_TIM_GET_COUNTER(htim10_new) < us) {}
 }
