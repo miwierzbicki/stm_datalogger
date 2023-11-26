@@ -56,8 +56,7 @@ void drawSensorConfig(Menu *menu) {
 }
 
 void drawSdConfig(Menu *menu) {
-	encSetRange(0, 1);
-
+	encSetRange(0, 0);
 	listAllItemsFromMenu(menu);
 	backButton(0, MAIN_MENU, 0);
 }
@@ -78,7 +77,9 @@ void drawOnoffMeasure(Menu *menu) {
 
 
 void drawSensorConfigAdcExt(Menu *menu) {
+	encSetRange(0, 4);
 	listAllItemsFromMenu(menu);
+	backButton(4, MAIN_MENU, 4);
 	//if przycisk wcisniety
 	//przypisanie wartoci z enkodera do zmiennej tej int globalnej
 	//ustawienie wartosci enuma globalnego na nastepne menu czyli np SENSOR_CONFIG_ADC_EXT1 lub EXT2 itp.
@@ -88,12 +89,14 @@ void drawSensorConfigAdcExt(Menu *menu) {
 //	}
 }
 void drawSensorConfigAdcInt(Menu *menu) {
+	encSetRange(0, 4);
 	listAllItemsFromMenu(menu);
-	backButton(1, MAIN_MENU, 1);
+	backButton(4, MAIN_MENU, 4);
 }
 void drawSensorConfigDS18(Menu *menu) {
+	encSetRange(0, 3);
 	listAllItemsFromMenu(menu);
-	backButton(1, MAIN_MENU, 1);
+	backButton(3, MAIN_MENU, 3);
 }
 
 typedef struct {
@@ -120,10 +123,11 @@ void drawInterruptTimes() {
 
 }
 
-int samplingRates[] = {1,2,3,4};
-int sampling1;
-int samplingIndex = 0;
-
+int samplingRates[] = {100,500,1000,5000};
+volatile int sampling1;
+volatile int samplingIndex = 0;
+volatile int counter=0;
+char sampl1str[10]="???";
 void drawSensorConfigGeneric(Menu *menu) {
 	encSetRange(0, 2);
 	ssd1306_SetCursor(0, 0);
@@ -134,8 +138,29 @@ void drawSensorConfigGeneric(Menu *menu) {
 		sprintf(isEnabledStr, "enabled: %s", sensors[0].isEnabled ? "true" : "false");
 		ssd1306_WriteString(isEnabledStr, Font_7x10, entrySelected(0) ? Black : White);
 		ssd1306_SetCursor(0, 28);
+//		char tempStrcat[15];
+		ssd1306_WriteString("period [ms]: ", Font_7x10, White);
+		ssd1306_SetCursor(90, 28);
+		ssd1306_WriteString(sampl1str, Font_7x10, entrySelected(1) ? Black : White);
+		if(entrySelected(1) && entryClicked(1)) { //tu sie dzieje cos dziwnego
+			send_uart("klikniete\n\r");
+			counter++;
+			if(counter>4) {
+				counter=1;
+			}
+			sampling1 = samplingRates[counter-1];
 
-		ssd1306_WriteString("period: NULL", Font_7x10, entrySelected(1) ? Black : White);
+			sprintf(sampl1str, "%d\n\r", sampling1);
+			send_uart(sampl1str);
+//			tempStrcat[15] = "period: ";
+//			strcat(tempStrcat, sampl1str);
+
+
+		}
+
+//		if(sampling1==samplingRate[0]) {
+//			ssd1306_WriteString(, Font_7x10, entrySelected(1) ? Black : White);
+//		}
 	}
 	else if(screen==SENSOR_CONFIG_ADC_EXT1) {
 		ssd1306_WriteString(sensors[1].name, Font_11x18, White);
