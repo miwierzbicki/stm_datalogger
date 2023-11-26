@@ -9,5 +9,5 @@
 ../Core/Src/menu.c:91:6:drawSensorConfigAdcInt	1
 ../Core/Src/menu.c:96:6:drawSensorConfigDS18	1
 ../Core/Src/menu.c:122:6:drawInterruptTimes	1
-../Core/Src/menu.c:131:6:drawSensorConfigGeneric	26
-../Core/Src/menu.c:298:6:displayMenu	1
+../Core/Src/menu.c:131:6:drawSensorConfigGeneric	29
+../Core/Src/menu.c:307:6:displayMenu	1

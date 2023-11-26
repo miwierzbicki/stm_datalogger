@@ -10,4 +10,4 @@
 ../Core/Src/menu.c:96:6:drawSensorConfigDS18	16	static
 ../Core/Src/menu.c:122:6:drawInterruptTimes	4	static
 ../Core/Src/menu.c:131:6:drawSensorConfigGeneric	240	static
-../Core/Src/menu.c:298:6:displayMenu	8	static
+../Core/Src/menu.c:307:6:displayMenu	8	static

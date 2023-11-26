@@ -104,7 +104,7 @@ typedef struct {
 	bool isEnabled;
 } Sensors;
 
-Sensors sensors[] = {
+volatile Sensors sensors[] = {
 
 		{"ADC EXT CH0", false}, //0
 		{"ADC EXT CH1", false}, //1
@@ -135,6 +135,15 @@ void drawSensorConfigGeneric(Menu *menu) {
 		ssd1306_WriteString(sensors[0].name, Font_11x18, White);
 		ssd1306_SetCursor(0, 18);
 		char isEnabledStr[20];
+
+		if(entrySelected(0) && entryClicked(0)) {
+			if(sensors[0].isEnabled==false) {
+				sensors[0].isEnabled=true;
+			}
+			else {
+				sensors[0].isEnabled=false;
+			}
+		}
 		sprintf(isEnabledStr, "enabled: %s", sensors[0].isEnabled ? "true" : "false");
 		ssd1306_WriteString(isEnabledStr, Font_7x10, entrySelected(0) ? Black : White);
 		ssd1306_SetCursor(0, 28);
