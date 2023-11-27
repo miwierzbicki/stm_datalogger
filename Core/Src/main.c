@@ -108,6 +108,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		HAL_TIM_Base_Stop_IT(htim);
 		if(HAL_GPIO_ReadPin(ENC_BTN_GPIO_Port, ENC_BTN_Pin)==GPIO_PIN_RESET) {
 			sendToUart=1;
+			send_uart("dupa\n\r");
 			}
 		}
 	}
@@ -178,8 +179,27 @@ void send_uart_uint32(uint32_t value) {
     HAL_UART_Transmit(&huart6, (uint8_t *)buffer, strlen(buffer), HAL_MAX_DELAY);
 }
 
+volatile uint8_t sensorsListIT1[10]; //przerwanie nr 1, etc.
+volatile uint8_t sensorsListIT2[10];
+volatile uint8_t sensorsListIT3[10];
+volatile uint8_t sensorsListIT4[10];
 
-
+//void updateSensorsListIT(void) {
+//	for(int i=0; i<10; i++) {
+//		if(sensors.samplingRate[i]==10) { //nie działa
+//			sensorsListIT1[i]=sensors.samplingRate[i];
+//		}
+//		else if(sensors.samplingRate[i]==50) {
+//			sensorsListIT2[i]=sensors.samplingRate[i];
+//		}
+//		else if(sensors.samplingRate[i]==100) {
+//			sensorsListIT3[i]=sensors.samplingRate[i];
+//		}
+//		else if(sensors.samplingRate[i]==500) {
+//			sensorsListIT4[i]=sensors.samplingRate[i];
+//		}
+//	}
+//}
 
 /* USER CODE END 0 */
 
@@ -240,6 +260,7 @@ int main(void)
   sd_closefile();
   sd_demount();
   bool debug=false;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -255,24 +276,24 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//	  if(debug) {
-//		  if(ch1przerwanie==1) {
-//			  HAL_UART_Transmit(&huart6, (uint8_t *)"ch1 sie wykonal \n\r", strlen("ch1 sie wykonal \n\r"), HAL_MAX_DELAY);
-//			  ch1przerwanie=0;
-//		  }
-//		  if(ch2przerwanie==1) { //castowanie na uint8_t bo funkcja oczekuje wlasnie takiego typu
-//			  HAL_UART_Transmit(&huart6, (uint8_t *)"ch2 sie wykonal \n\r", strlen("ch2 sie wykonal \n\r"), HAL_MAX_DELAY);
-//			  ch2przerwanie=0;
-//		  }
-//		  if(ch3przerwanie==1) {
-//			  HAL_UART_Transmit(&huart6, (uint8_t *)"ch3 sie wykonal \n\r", strlen("ch3 sie wykonal \n\r"), HAL_MAX_DELAY);
-//			  ch3przerwanie=0;
-//			  }
-//		  if(ch4przerwanie==1) {
-//			  HAL_UART_Transmit(&huart6, (uint8_t *)"ch4 sie wykonal \n\r", strlen("ch4 sie wykonal \n\r"), HAL_MAX_DELAY);
-//			  ch4przerwanie=0;
-//		  }
-//	  }
+	  if(debug) {
+		  if(ch1przerwanie==1) {
+			  HAL_UART_Transmit(&huart6, (uint8_t *)"ch1 sie wykonal \n\r", strlen("ch1 sie wykonal \n\r"), HAL_MAX_DELAY);
+			  ch1przerwanie=0;
+		  }
+		  if(ch2przerwanie==1) { //castowanie na uint8_t bo funkcja oczekuje wlasnie takiego typu
+			  HAL_UART_Transmit(&huart6, (uint8_t *)"ch2 sie wykonal \n\r", strlen("ch2 sie wykonal \n\r"), HAL_MAX_DELAY);
+			  ch2przerwanie=0;
+		  }
+		  if(ch3przerwanie==1) {
+			  HAL_UART_Transmit(&huart6, (uint8_t *)"ch3 sie wykonal \n\r", strlen("ch3 sie wykonal \n\r"), HAL_MAX_DELAY);
+			  ch3przerwanie=0;
+			  }
+		  if(ch4przerwanie==1) {
+			  HAL_UART_Transmit(&huart6, (uint8_t *)"ch4 sie wykonal \n\r", strlen("ch4 sie wykonal \n\r"), HAL_MAX_DELAY);
+			  ch4przerwanie=0;
+		  }
+	  }
 
 //	  uint32_t valueAdc[2];
 //	  HAL_ADC_Start(&hadc1);
@@ -289,6 +310,8 @@ int main(void)
 //	  HAL_UART_Transmit(&huart6, (uint8_t *)charAr, strlen(charAr), HAL_MAX_DELAY);
 //	  prev_value=value;
 //	  }
+
+	  //updateSensorsListIT(); //nie działa
 	displayMenu();
   }
   /* USER CODE END 3 */

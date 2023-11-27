@@ -37,6 +37,7 @@ typedef enum {
 
 void huart_ds_init(UART_HandleTypeDef *huart6);
 
+
 typedef struct MenuEntry {
    Screen entry;
    const char *entry_string;

@@ -12,7 +12,7 @@
 #include "string.h"
 #include "main.h"
 
-
+extern bool sdReady;
 void sd_init();
 uint32_t sd_totalspace();
 uint32_t sd_freespace();

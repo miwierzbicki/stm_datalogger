@@ -24,10 +24,9 @@ FATFS *pfs;
 DWORD fre_clust;
 uint32_t total, free_space;
 
-// functions
 char buffer[128];
 bool sdReady = false;
-
+// functions
 void sd_demount() {
 	f_mount(NULL, "", 0);
 }
