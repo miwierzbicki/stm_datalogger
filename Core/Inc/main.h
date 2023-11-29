@@ -58,6 +58,7 @@ bool isClicked(void);
 void clearEncButton(void);
 void send_uart_uint32(uint32_t value);
 void send_uart(char *string);
+
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

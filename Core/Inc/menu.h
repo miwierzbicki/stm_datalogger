@@ -37,7 +37,14 @@ typedef enum {
 
 void huart_ds_init(UART_HandleTypeDef *huart6);
 
+typedef struct {
+	char name[20];
+	bool isEnabled;
+	uint16_t samplingRate;
+} Sensors;
 
+void ch1Enable(void);
+void ch2Enable(void);
 typedef struct MenuEntry {
    Screen entry;
    const char *entry_string;

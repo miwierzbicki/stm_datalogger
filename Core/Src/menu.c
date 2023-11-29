@@ -24,6 +24,7 @@ void backButton(uint8_t back_pos, uint8_t target_screen, uint16_t encoder_pos) {
 	ssd1306_WriteString("COFNIJ", Font_6x8, entrySelected(back_pos) ? Black : White);
 	if(entryClicked(back_pos)) {
 		encSetPos(0);
+		//confirm=true;
 		screen = target_screen;
 	}
 }
@@ -116,11 +117,7 @@ void drawSensorConfigDS18(Menu *menu) {
 	backButton(3, MAIN_MENU, 3);
 }
 
-typedef struct {
-	char name[20];
-	bool isEnabled;
-	uint16_t samplingRate;
-} Sensors;
+
 
 Sensors sensors[] = {
 		{"ADC EXT CH0", false, 0}, //0
@@ -167,8 +164,8 @@ void drawSensorOptions(uint8_t index) {
 			counter=1;
 		}
 		sensors[index].samplingRate = samplingRates[counter-1];
+	}
 
-}
 }
 
 
@@ -179,6 +176,29 @@ void drawSensorConfigGeneric(Menu *menu) {
 	backButton(2, MAIN_MENU, 2);
 //}
 }
+
+
+void ch1Enable(void) {
+	for(int i=0; i<10; i++) {
+		if(sensors[i].samplingRate==10 && sensors[i].isEnabled) {
+		  send_uart("dupa 10ms\n\r");
+		}
+	}
+}
+
+void ch2Enable(void) {
+	for(int i=0; i<10; i++) {
+		if(sensors[i].samplingRate==50 && sensors[i].isEnabled) {
+		  send_uart("dupa 50ms\n\r");
+		}
+	}
+}
+
+
+
+
+
+
 
 Menu menu[] = {
 	[MAIN_MENU]={drawMainMenu, 3,
