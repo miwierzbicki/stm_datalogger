@@ -24,18 +24,18 @@ void CircularBuffer_Init(CircularBuffer *buffer) {
     buffer->tail = 0;
 }
 
-CircularBuffer myBuffer;
+CircularBuffer csvLineBuffer;
 
 
 bool CircularBuffer_Add(CircularBuffer *buffer, uint8_t data) {
-    // Sprawdź, czy bufor nie jest pełny
+    // czy ma miejsce
     if (((buffer->head + 1) % BUFFER_SIZE) != buffer->tail) {
         buffer->buffer[buffer->head] = data;
         buffer->head = (buffer->head + 1) % BUFFER_SIZE;
         return true;
     }
     return false;
-    // Jeśli bufor jest pełny, można obsłużyć to w odpowiedni sposób (np. zignorować nowe dane lub nadpisać stare)
+    // dopisać nadpisywanie danych gdy pełny
 }
 
 
@@ -47,29 +47,30 @@ uint8_t CircularBuffer_Get(CircularBuffer *buffer) {
         buffer->tail = (buffer->tail + 1) % BUFFER_SIZE;
         return data;
     }
-    // Jeśli bufor jest pusty, można obsłużyć to w odpowiedni sposób (np. zwrócić specjalną wartość lub zablokować wykonanie)
+    //jeżeli pusty
     return 0;
 }
 
 void buff(void) {
 
-	CircularBuffer_Init(&myBuffer);
+	CircularBuffer_Init(&csvLineBuffer);
 	// Przykładowe użycie bufora kołowego
-	CircularBuffer_Add(&myBuffer, 10);
-	CircularBuffer_Add(&myBuffer, 20);
-	CircularBuffer_Add(&myBuffer, 'B');
-	//uint8_t data = CircularBuffer_Get(&myBuffer);
+	CircularBuffer_Add(&csvLineBuffer, 10);
+	//do bufora bedzie dodawana gotowa linijka stringa do .csv
+	CircularBuffer_Add(&csvLineBuffer, 20);
+	CircularBuffer_Add(&csvLineBuffer, 'B');
+	//uint8_t data = CircularBuffer_Get(&csvLineBuffer);
 	char temp[10];
-	sprintf(temp, "%u \n\r", CircularBuffer_Get(&myBuffer));
+	sprintf(temp, "%u \n\r", CircularBuffer_Get(&csvLineBuffer));
 	send_uart(temp);
-	sprintf(temp, "%u \n\r", CircularBuffer_Get(&myBuffer));
+	sprintf(temp, "%u \n\r", CircularBuffer_Get(&csvLineBuffer));
 	send_uart(temp);
-	sprintf(temp, "%u \n\r", CircularBuffer_Get(&myBuffer));
+	sprintf(temp, "%u \n\r", CircularBuffer_Get(&csvLineBuffer));
 	send_uart(temp);
 
 }
 
 //void printBuffor(void) {
-//	send_uart(CircularBuffer_Get(&myBuffer));
+//	send_uart(CircularBuffer_Get(&csvLineBuffer));
 //	send_uart("\n\r");
 //}

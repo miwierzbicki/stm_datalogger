@@ -36,6 +36,7 @@ typedef enum {
 
 
 void huart_ds_init(UART_HandleTypeDef *huart6);
+void sendRtcHandler(RTC_HandleTypeDef *hrtc);
 
 typedef struct {
 	char name[20];

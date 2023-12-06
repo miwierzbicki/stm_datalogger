@@ -60,6 +60,8 @@ ADC_HandleTypeDef hadc1;
 I2C_HandleTypeDef hi2c1;
 I2C_HandleTypeDef hi2c2;
 
+RTC_HandleTypeDef hrtc;
+
 SPI_HandleTypeDef hspi1;
 
 TIM_HandleTypeDef htim1;
@@ -85,6 +87,7 @@ static void MX_USART6_UART_Init(void);
 static void MX_TIM10_Init(void);
 static void MX_TIM11_Init(void);
 static void MX_TIM2_Init(void);
+static void MX_RTC_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -108,7 +111,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		HAL_TIM_Base_Stop_IT(htim);
 		if(HAL_GPIO_ReadPin(ENC_BTN_GPIO_Port, ENC_BTN_Pin)==GPIO_PIN_RESET) {
 			sendToUart=1;
-			send_uart("dupa\n\r");
+
 			}
 		}
 	}
@@ -144,14 +147,6 @@ void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim) {
     }
 }
 
-//void DWT_Init(void) //pożyczone z https://github.com/keatis/dwt_delay/blob/master/dwt_delay.c
-//{
-//    if (!(CoreDebug->DEMCR & CoreDebug_DEMCR_TRCENA_Msk)) {
-//        CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-//        DWT->CYCCNT = 0;
-//        DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
-//    }
-//} //sprawdzic czy nie mozna usunac tego
 
 char charAr[50];
 
@@ -221,19 +216,19 @@ int main(void)
   MX_TIM11_Init();
   MX_TIM2_Init();
   MX_FATFS_Init();
+  MX_RTC_Init();
   /* USER CODE BEGIN 2 */
   encoderInit(&htim1);
   ds18_init(&htim10);
   huart_ds_init(&huart6);
+  sendRtcHandler(&hrtc);
   HAL_TIM_Base_Start(&htim10);
   displayInit();
-
   wire_reset();
   buff();
   sd_init();
   sd_totalspace();
   sd_freespace();
-
   sd_writefile();
   sd_closefile();
   sd_readfile();
@@ -257,24 +252,35 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	  if(debug) {
+		  bool needToWrite=false;
 		  if(ch1przerwanie==1) {
 			  //HAL_UART_Transmit(&huart6, (uint8_t *)"ch1 sie wykonal \n\r", strlen("ch1 sie wykonal \n\r"), HAL_MAX_DELAY);
 			  ch1Enable();
 			  ch1przerwanie=0;
+			  needToWrite=true;
 		  }
 		  if(ch2przerwanie==1) { //castowanie na uint8_t bo funkcja oczekuje wlasnie takiego typu
 			  //HAL_UART_Transmit(&huart6, (uint8_t *)"ch2 sie wykonal \n\r", strlen("ch2 sie wykonal \n\r"), HAL_MAX_DELAY);
 			  ch2Enable();
 			  ch2przerwanie=0;
+			  needToWrite=true;
 		  }
 		  if(ch3przerwanie==1) {
 			  //HAL_UART_Transmit(&huart6, (uint8_t *)"ch3 sie wykonal \n\r", strlen("ch3 sie wykonal \n\r"), HAL_MAX_DELAY);
+			  ch3Enable();
 			  ch3przerwanie=0;
+			  needToWrite=true;
 			  }
 		  if(ch4przerwanie==1) {
 			  //HAL_UART_Transmit(&huart6, (uint8_t *)"ch4 sie wykonal \n\r", strlen("ch4 sie wykonal \n\r"), HAL_MAX_DELAY);
+			  ch4Enable();
 			  ch4przerwanie=0;
+			  needToWrite=true;
 		  }
+		  if(needToWrite) {
+			  //tu sklejanie stringa z wynikami wszystkich pomiarów i wysłanie na bufor kołowy
+		  }
+
 	  }
 
 //	  uint32_t valueAdc[2];
@@ -316,7 +322,8 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSE;
+  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
@@ -471,6 +478,69 @@ static void MX_I2C2_Init(void)
   /* USER CODE BEGIN I2C2_Init 2 */
 
   /* USER CODE END I2C2_Init 2 */
+
+}
+
+/**
+  * @brief RTC Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_RTC_Init(void)
+{
+
+  /* USER CODE BEGIN RTC_Init 0 */
+
+  /* USER CODE END RTC_Init 0 */
+
+  RTC_TimeTypeDef sTime = {0};
+  RTC_DateTypeDef sDate = {0};
+
+  /* USER CODE BEGIN RTC_Init 1 */
+
+  /* USER CODE END RTC_Init 1 */
+
+  /** Initialize RTC Only
+  */
+  hrtc.Instance = RTC;
+  hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
+  hrtc.Init.AsynchPrediv = 127;
+  hrtc.Init.SynchPrediv = 255;
+  hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
+  hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+  hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+  if (HAL_RTC_Init(&hrtc) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /* USER CODE BEGIN Check_RTC_BKUP */
+
+  /* USER CODE END Check_RTC_BKUP */
+
+  /** Initialize RTC and set the Time and Date
+  */
+  sTime.Hours = 0x1;
+  sTime.Minutes = 0x0;
+  sTime.Seconds = 0x0;
+  sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+  sTime.StoreOperation = RTC_STOREOPERATION_RESET;
+  if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sDate.WeekDay = RTC_WEEKDAY_WEDNESDAY;
+  sDate.Month = RTC_MONTH_DECEMBER;
+  sDate.Date = 0x6;
+  sDate.Year = 0x23;
+
+  if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BCD) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN RTC_Init 2 */
+
+  /* USER CODE END RTC_Init 2 */
 
 }
 
@@ -756,12 +826,6 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, LED2_Pin|LED1_Pin|LED4_Pin|LED3_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : ALERT_ADS_Pin */
-  GPIO_InitStruct.Pin = ALERT_ADS_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(ALERT_ADS_GPIO_Port, &GPIO_InitStruct);
-
   /*Configure GPIO pins : CS_SD_Pin LED5_Pin */
   GPIO_InitStruct.Pin = CS_SD_Pin|LED5_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -798,9 +862,6 @@ static void MX_GPIO_Init(void)
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
-
-  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */

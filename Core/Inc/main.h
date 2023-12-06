@@ -55,6 +55,7 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 bool isClicked(void);
+//bool debug;
 void clearEncButton(void);
 void send_uart_uint32(uint32_t value);
 void send_uart(char *string);
@@ -62,9 +63,6 @@ void send_uart(char *string);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define ALERT_ADS_Pin GPIO_PIN_15
-#define ALERT_ADS_GPIO_Port GPIOC
-#define ALERT_ADS_EXTI_IRQn EXTI15_10_IRQn
 #define ADC1_IN0_INT_Pin GPIO_PIN_0
 #define ADC1_IN0_INT_GPIO_Port GPIOA
 #define ADC1_IN1_INT_Pin GPIO_PIN_1
