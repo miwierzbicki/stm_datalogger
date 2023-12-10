@@ -37,7 +37,7 @@ typedef enum {
 
 void huart_ds_init(UART_HandleTypeDef *huart6);
 void sendRtcHandler(RTC_HandleTypeDef *hrtc);
-
+extern volatile bool dataOverwrite;
 typedef struct {
 	char name[20];
 	bool isEnabled;
@@ -46,6 +46,8 @@ typedef struct {
 
 void ch1Enable(void);
 void ch2Enable(void);
+void ch3Enable(void);
+void ch4Enable(void);
 typedef struct MenuEntry {
    Screen entry;
    const char *entry_string;

@@ -3,5 +3,5 @@
 ../Core/Src/sd.c:47:10:sd_freespace	2
 ../Core/Src/sd.c:58:10:sd_totalspace	2
 ../Core/Src/sd.c:69:6:sd_readfile	3
-../Core/Src/sd.c:84:6:sd_writefile	2
-../Core/Src/sd.c:93:6:sd_closefile	2
+../Core/Src/sd.c:86:6:sd_writefile	3
+../Core/Src/sd.c:101:6:sd_closefile	2

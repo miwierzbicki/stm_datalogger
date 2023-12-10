@@ -9,6 +9,8 @@
 #include "ds18b20.h"
 #include "sd.h"
 #include "main.h"
+#include "save.h"
+#include "adc.h"
 
 uint16_t encoderMin;
 uint16_t encoderMax;
@@ -37,23 +39,25 @@ void backButton(uint8_t back_pos, uint8_t target_screen, uint16_t encoder_pos) {
 
 void listAllItemsFromMenu(Menu *menu) {
 	for (int i = 0; i < menu->entry_count; ++i) { //-> bo entry_count na stercie cpu jest (heap)
-			ssd1306_SetCursor(0, i*8);
+			ssd1306_SetCursor(0, i*10);
 			if(entryClicked(i)) {
 				screen = menu->entries[i].entry;
 				break;
 			}
-			ssd1306_WriteString(menu->entries[i].entry_string, Font_6x8, entrySelected(i) ? Black : White);
+			ssd1306_WriteString(menu->entries[i].entry_string, Font_7x10, entrySelected(i) ? Black : White);
 		  }
 }
 
 void drawMainMenu(Menu *menu) {
-	encSetRange(0, 39);
+	encSetRange(0, 2);
 	listAllItemsFromMenu(menu);
 	uint32_t encVal = encoderGet();
 	char charArVal[4];
 	sprintf(charArVal, "%lu", encVal);
-	ssd1306_SetCursor(0, 30);
-	ssd1306_WriteString(charArVal, Font_16x24, White);
+	ssd1306_SetCursor(0, 44);
+	ssd1306_WriteString(charArVal, Font_7x10, White);
+	ssd1306_SetCursor(0, 54);
+	ssd1306_WriteString(getRtcString(), Font_7x10, White);
 
 }
 
@@ -91,6 +95,7 @@ void drawSdConfig(Menu *menu) {
 	ssd1306_WriteString(strDataOverwrite, Font_7x10, entrySelected(0) ? Black : White);
 	backButton(1, MAIN_MENU, 0);
 }
+
 
 
 
@@ -181,7 +186,9 @@ void ch1Enable(void) {
 void ch2Enable(void) {
 	for(int i=0; i<10; i++) {
 		if(sensors[i].samplingRate==50 && sensors[i].isEnabled) {
-		  send_uart("50ms\n\r");
+			send_uart(getRtcString());
+			//
+
 		}
 	}
 }
@@ -217,9 +224,21 @@ void drawOnoffMeasure(Menu *menu) {
 //	sprintf(tempStr, "%.2f \n\r", temp);
 //	ssd1306_WriteString(tempStr, Font_16x24, White);
 //	HAL_UART_Transmit(huart6_new, tempStr, strlen(tempStr), HAL_MAX_DELAY);
-	ssd1306_SetCursor(0, 0);
-	uint8_t currPos=0;
+	uint8_t currPos;
+	if(!sdReady) {
+		ssd1306_SetCursor(0, 0);
+		ssd1306_WriteString("SD NOT READY!", Font_6x8, White);
+		ssd1306_SetCursor(0, 8);
+		currPos=0;
+	}
+	else {
+		ssd1306_SetCursor(0, 0);
+		currPos=-8;
+	}
+
+
 	char sensorDetailsStr[30];
+	encSetRange(0,2);
 	for(int i=0; i<11; i++) {
 		if(sensors[i].isEnabled) {
 			sprintf(sensorDetailsStr, "%s: %d\n\r", sensors[i].name, sensors[i].samplingRate);
@@ -229,24 +248,41 @@ void drawOnoffMeasure(Menu *menu) {
 		}
 	}
 
-	RTC_TimeTypeDef time;
-	RTC_DateTypeDef date;
 
-	HAL_RTC_GetTime(hrtc_new, &time, RTC_FORMAT_BIN);
-	HAL_RTC_GetDate(hrtc_new, &date, RTC_FORMAT_BIN);
-	char rtcTimeStr[50];
-	char rtcDateStr[50];
-
-	sprintf(rtcTimeStr, "%02d:%02d:%02d", time.Hours, time.Minutes, time.Seconds);
-	sprintf(rtcDateStr, "%02d/%02d/%02d", date.Date, date.Month, date.Year);
 	ssd1306_SetCursor(0, 16);
+	ssd1306_WriteString("WRITE buff", Font_7x10, entrySelected(0) ? Black : White);
+	extern CircularBuffer cb;
+	if(entrySelected(0) && entryClicked(0)) {
+		float val=ds18_get_temp();
+		char str[20];
+		sprintf(str, "%f\n\r", val);
+
+		CircularBuffer_Add(&cb, str);
+//		sd_writefile("test;test;123;123.4;0.0 ");
+//		sd_closefile();
+	}
 	//ssd1306_WriteString(rtcTimeStr, Font_7x10, White);
 	ssd1306_SetCursor(0, 26);
+	ssd1306_WriteString("adc/READ buff", Font_7x10, entrySelected(1) ? Black : White);
+	if(entrySelected(1) && entryClicked(1)) {
+//		volatile const char *dataFromBuff = CircularBuffer_Read(&cb);
+//		if(dataFromBuff==NULL) {
+//			send_uart("Bufor jest pusty\n\r");
+//		}
+//		else {
+//			send_uart(dataFromBuff);
+//		}
+		getValAdc();
+//		sd_readfile();
+//		sd_closefile();
+	}
 	//ssd1306_WriteString(rtcDateStr, Font_7x10, White);
 
-	backButton(1, MAIN_MENU, 1);
+	backButton(2, MAIN_MENU, 2);
 
 }
+
+
 
 
 Menu menu[] = {

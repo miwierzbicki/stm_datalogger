@@ -11,8 +11,10 @@
 #include "ds18b20.h"
 #include "string.h"
 #include "main.h"
+#include "fatfs.h"
 
 extern bool sdReady;
+extern BYTE SD_SAVEMODE;
 void sd_init();
 uint32_t sd_totalspace();
 uint32_t sd_freespace();

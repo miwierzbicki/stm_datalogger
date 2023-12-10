@@ -11,7 +11,7 @@
 #include "ds18b20.h"
 #include "string.h"
 #include "main.h"
-#include "fatfs.h" //sprawdzic czy to potrzebne XD
+#include "fatfs.h"
 
 //do obslugi fatfs
 FATFS fs;  // file system
@@ -40,7 +40,7 @@ void sd_init() {
 	}
 	else {
 		sdReady = false;
-		send_uart("sd status: sd err\n\r");
+		send_uart("sd status: SD ERR\n\r");
 	}
 }
 
@@ -70,29 +70,37 @@ void sd_readfile() {
 	if(sdReady) {
 	fresult = f_open(&fil, "file1.txt", FA_READ); //tu odczyt
 		if(fresult==FR_OK) {
-			send_uart("opening file1.txt, data: \n\r");
+			send_uart("<data>: ");
+			memset(buffer, 0, sizeof(buffer)); //czyszczenie bufora
 			f_read(&fil, buffer, f_size(&fil), &br);
 			send_uart(buffer);
 			send_uart("\n\r");
 		}
 		else {
-			send_uart("error while opening file... \n\r");
+			send_uart("<error  opening file>\n\r");
 		}
 	}
 }
+volatile BYTE SD_SAVEMODE;
 
-void sd_writefile() {
+void sd_writefile(char sdWriteBuff[100]) {
+	if(dataOverwrite) {
+		SD_SAVEMODE = FA_CREATE_ALWAYS | FA_READ | FA_WRITE;
+	}
+	else {
+		SD_SAVEMODE = FA_OPEN_APPEND | FA_READ | FA_WRITE;
+	}
 	if(sdReady) {
-		fresult = f_open(&fil, "file1.txt", FA_CREATE_ALWAYS | FA_READ | FA_WRITE); // TU ZAPIS
+		fresult = f_open(&fil, "file1.txt", SD_SAVEMODE); // TU ZAPIS
 		/* Writing text */
-		f_puts("test test test", &fil);
-		send_uart("file written \n\r");
+		f_puts(sdWriteBuff, &fil);
+		send_uart("<file written>\n\r");
 	}
 }
 
 void sd_closefile() {
 	if(sdReady) {
 		fresult = f_close(&fil);
-		send_uart("closing file\n\r");
+		send_uart("<closing file>\n\r");
 	}
 }

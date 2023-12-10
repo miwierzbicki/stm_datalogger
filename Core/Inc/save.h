@@ -1,13 +1,16 @@
 #include <stdio.h>
 
-#define BUFFER_SIZE 1000
+#define BUF_SIZE 100
+#define STR_SIZE 100
 
 typedef struct {
-	uint8_t buffer[BUFFER_SIZE];
-	uint8_t head;
-	uint8_t tail;
+    char data[BUF_SIZE][STR_SIZE];
+    int head;
+    int tail;
 } CircularBuffer;
-void CircularBuffer_Init(CircularBuffer *buffer);
-void CircularBuffer_Add(CircularBuffer *buffer, uint8_t data);
-uint8_t CircularBuffer_Get(CircularBuffer *buffer);
-void buff(void);
+
+extern CircularBuffer cb;
+
+void CircularBuffer_Init(CircularBuffer* cb);
+void CircularBuffer_Add(CircularBuffer* cb, char* str);
+char* CircularBuffer_Read(CircularBuffer* cb);

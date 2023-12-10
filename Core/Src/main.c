@@ -173,7 +173,20 @@ void send_uart_uint32(uint32_t value) {
     snprintf(buffer, sizeof(buffer), "%lu \n\r", value);
     HAL_UART_Transmit(&huart6, (uint8_t *)buffer, strlen(buffer), HAL_MAX_DELAY);
 }
+RTC_TimeTypeDef time;
+RTC_DateTypeDef date;
+char* getRtcString(void)  {
+	static char dateTime[100];
+	char rtcTimeStr[50];
+	char rtcDateStr[50];
+	HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BIN);
+	HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BIN);
+	sprintf(rtcTimeStr, "%02d:%02d:%02d", time.Hours, time.Minutes, time.Seconds);
+	sprintf(rtcDateStr, "%02d/%02d/%02d", date.Date, date.Month, date.Year);
+	sprintf(dateTime, "%s %s", rtcTimeStr, rtcDateStr);
 
+	return dateTime;
+}
 
 
 /* USER CODE END 0 */
@@ -219,21 +232,27 @@ int main(void)
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
   encoderInit(&htim1);
+
   ds18_init(&htim10);
+  adc_int_init(&hadc1);
   huart_ds_init(&huart6);
   sendRtcHandler(&hrtc);
   HAL_TIM_Base_Start(&htim10);
   displayInit();
   wire_reset();
-  buff();
+
+  CircularBuffer_Init(&cb);
   sd_init();
-  sd_totalspace();
-  sd_freespace();
-  sd_writefile();
-  sd_closefile();
-  sd_readfile();
-  sd_closefile();
-  sd_demount();
+  send_uart("total: ");
+  send_uart_uint32(sd_totalspace());
+  send_uart("\n\rfree: ");
+  send_uart_uint32(sd_freespace());
+  send_uart("\n\r");
+//  sd_writefile();
+//  sd_closefile();
+//  sd_readfile();
+//  sd_closefile();
+//  sd_demount();
   bool debug=true;
 
   /* USER CODE END 2 */
@@ -262,6 +281,7 @@ int main(void)
 		  if(ch2przerwanie==1) { //castowanie na uint8_t bo funkcja oczekuje wlasnie takiego typu
 			  //HAL_UART_Transmit(&huart6, (uint8_t *)"ch2 sie wykonal \n\r", strlen("ch2 sie wykonal \n\r"), HAL_MAX_DELAY);
 			  ch2Enable();
+
 			  ch2przerwanie=0;
 			  needToWrite=true;
 		  }
@@ -375,13 +395,13 @@ static void MX_ADC1_Init(void)
   hadc1.Instance = ADC1;
   hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
-  hadc1.Init.ScanConvMode = ENABLE;
+  hadc1.Init.ScanConvMode = DISABLE;
   hadc1.Init.ContinuousConvMode = DISABLE;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion = 2;
+  hadc1.Init.NbrOfConversion = 1;
   hadc1.Init.DMAContinuousRequests = DISABLE;
   hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
@@ -393,16 +413,7 @@ static void MX_ADC1_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_0;
   sConfig.Rank = 1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_56CYCLES;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-  */
-  sConfig.Channel = ADC_CHANNEL_1;
-  sConfig.Rank = 2;
+  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -882,6 +893,7 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
+	  send_uart("error handler loop");
   }
   /* USER CODE END Error_Handler_Debug */
 }

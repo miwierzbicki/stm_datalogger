@@ -59,7 +59,10 @@ bool isClicked(void);
 void clearEncButton(void);
 void send_uart_uint32(uint32_t value);
 void send_uart(char *string);
-
+char* getRtcString(void);
+extern RTC_TimeTypeDef time;
+extern RTC_DateTypeDef date;
+char* getRtcString(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

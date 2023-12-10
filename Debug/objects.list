@@ -1,3 +1,4 @@
+"./Core/Src/adc.o"
 "./Core/Src/ds18b20.o"
 "./Core/Src/encoder.o"
 "./Core/Src/main.o"

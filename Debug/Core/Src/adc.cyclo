@@ -1,0 +1,3 @@
+../Core/Src/adc.c:15:6:adc_int_init	1
+../Core/Src/adc.c:19:6:adc_select_ch	2
+../Core/Src/adc.c:31:6:getValAdc	1

@@ -10,67 +10,39 @@
 #include <stdbool.h>
 #include "encoder.h"
 
+#define BUF_SIZE 100
+#define STR_SIZE 100
 
-#define BUFFER_SIZE 1000
 
 typedef struct {
-	uint8_t buffer[BUFFER_SIZE];
-	uint8_t head;
-	uint8_t tail;
+    char data[BUF_SIZE][STR_SIZE];
+    int head;
+    int tail;
 } CircularBuffer;
 
-void CircularBuffer_Init(CircularBuffer *buffer) {
-    buffer->head = 0;
-    buffer->tail = 0;
+
+
+void CircularBuffer_Init(CircularBuffer* cb) {
+    cb->head = 0;
+    cb->tail = 0;
 }
 
-CircularBuffer csvLineBuffer;
+volatile CircularBuffer cb;
 
-
-bool CircularBuffer_Add(CircularBuffer *buffer, uint8_t data) {
-    // czy ma miejsce
-    if (((buffer->head + 1) % BUFFER_SIZE) != buffer->tail) {
-        buffer->buffer[buffer->head] = data;
-        buffer->head = (buffer->head + 1) % BUFFER_SIZE;
-        return true;
+void CircularBuffer_Add(CircularBuffer* cb, char* str) {
+    strncpy(cb->data[cb->head], str, STR_SIZE);
+    cb->head = (cb->head + 1) % BUF_SIZE;
+    if (cb->head == cb->tail) {
+        cb->tail = (cb->tail + 1) % BUF_SIZE;
     }
-    return false;
-    // dopisać nadpisywanie danych gdy pełny
 }
 
-
-// Funkcja pobierająca element z bufora
-uint8_t CircularBuffer_Get(CircularBuffer *buffer) {
-    // Sprawdź, czy bufor nie jest pusty
-    if (buffer->head != buffer->tail) {
-        uint8_t data = buffer->buffer[buffer->tail];
-        buffer->tail = (buffer->tail + 1) % BUFFER_SIZE;
-        return data;
+char* CircularBuffer_Read(CircularBuffer* cb) {
+    if (cb->head == cb->tail) {
+        printf("Buffer is empty\n");
+        return NULL;
     }
-    //jeżeli pusty
-    return 0;
+    char* str = cb->data[cb->tail];
+    cb->tail = (cb->tail + 1) % BUF_SIZE;
+    return str;
 }
-
-void buff(void) {
-
-	CircularBuffer_Init(&csvLineBuffer);
-	// Przykładowe użycie bufora kołowego
-	CircularBuffer_Add(&csvLineBuffer, 10);
-	//do bufora bedzie dodawana gotowa linijka stringa do .csv
-	CircularBuffer_Add(&csvLineBuffer, 20);
-	CircularBuffer_Add(&csvLineBuffer, 'B');
-	//uint8_t data = CircularBuffer_Get(&csvLineBuffer);
-	char temp[10];
-	sprintf(temp, "%u \n\r", CircularBuffer_Get(&csvLineBuffer));
-	send_uart(temp);
-	sprintf(temp, "%u \n\r", CircularBuffer_Get(&csvLineBuffer));
-	send_uart(temp);
-	sprintf(temp, "%u \n\r", CircularBuffer_Get(&csvLineBuffer));
-	send_uart(temp);
-
-}
-
-//void printBuffor(void) {
-//	send_uart(CircularBuffer_Get(&csvLineBuffer));
-//	send_uart("\n\r");
-//}
