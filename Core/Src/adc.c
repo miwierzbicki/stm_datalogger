@@ -31,30 +31,21 @@ void adc_select_ch(uint32_t channel) { //trzeba wywolywac za kazdym razem przed 
 void getValAdc(void) {
 	uint32_t value;
 	adc_select_ch(ADC_CHANNEL_1);
-  HAL_ADC_Start(hadc1_new);
-  HAL_ADC_PollForConversion(hadc1_new, HAL_MAX_DELAY);
-  value = HAL_ADC_GetValue(hadc1_new);
-  float voltage = 3.3f * value / 4096.0f;
-//  HAL_ADC_PollForConversion(hadc1_new, HAL_MAX_DELAY);
-//  value[1] = HAL_ADC_GetValue(hadc1_new);
-//
-//  HAL_ADC_PollForConversion(hadc1_new, HAL_MAX_DELAY);
-//  value[2] = HAL_ADC_GetValue(hadc1_new);
-//
-//  HAL_ADC_PollForConversion(hadc1_new, HAL_MAX_DELAY);
-//  value[3] = HAL_ADC_GetValue(hadc1_new);
-//  HAL_ADC_Stop(hadc1_new);
-  char adcStr[200];
-  sprintf(adcStr, "a0=%lu (%.3f V)\n\r", value, voltage);
-  send_uart(adcStr);
+	HAL_ADC_Start(hadc1_new);
+	HAL_ADC_PollForConversion(hadc1_new, HAL_MAX_DELAY);
+	value = HAL_ADC_GetValue(hadc1_new);
+	float voltage = 3.3f * value / 4096.0f;
+	char adcStr[200];
+	sprintf(adcStr, "a0=%lu (%.3f V)\n\r", value, voltage);
+	send_uart(adcStr);
 
-  adc_select_ch(ADC_CHANNEL_3);
+	adc_select_ch(ADC_CHANNEL_3);
     HAL_ADC_Start(hadc1_new);
     HAL_ADC_PollForConversion(hadc1_new, HAL_MAX_DELAY);
     value = HAL_ADC_GetValue(hadc1_new);
     voltage = 3.3f * value / 4096.0f;
     sprintf(adcStr, "a3=%lu (%.3f V)\n\r", value, voltage);
-      send_uart(adcStr);
+    send_uart(adcStr);
 }
 
 float getValueAdcExtCh0(void) {

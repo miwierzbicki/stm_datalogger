@@ -39,7 +39,7 @@ void CircularBuffer_Add(CircularBuffer* cb, char* str) {
 
 char* CircularBuffer_Read(CircularBuffer* cb) {
     if (cb->head == cb->tail) {
-        printf("Buffer is empty\n");
+        printf("bufor jest pusty\n");
         return NULL;
     }
     char* str = cb->data[cb->tail];

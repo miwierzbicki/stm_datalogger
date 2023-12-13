@@ -234,16 +234,7 @@ void ch4Enable(void) {
 
 
 void drawOnoffMeasure(Menu *menu) {
-	//listAllItemsFromMenu(menu);
-//	encSetRange(0, 1);
-//	float temp = ds18_get_temp();
-//	char tempStr[10];
-//	ssd1306_SetCursor(0, 0);
-//	ssd1306_WriteString("ds18b20_1 value:", Font_7x10, White);
-//	ssd1306_SetCursor(0, 12);
-//	sprintf(tempStr, "%.2f \n\r", temp);
-//	ssd1306_WriteString(tempStr, Font_16x24, White);
-//	HAL_UART_Transmit(huart6_new, tempStr, strlen(tempStr), HAL_MAX_DELAY);
+
 	uint8_t currPos;
 	if(!sdReady) {
 		ssd1306_SetCursor(0, 0);
@@ -326,7 +317,7 @@ Menu menu[] = {
 			{SENSOR_CONFIG_ADC_EXT3, "ADC EXT CH3"}
 			}
 	},
-	//do wywolywania menu generycznego z parametrami pomiaru (fs, on/off)
+
 	[SENSOR_CONFIG_ADC_EXT0] = {drawSensorConfigGeneric,0,{}},
 	[SENSOR_CONFIG_ADC_EXT1] = {drawSensorConfigGeneric,0,{}},
 	[SENSOR_CONFIG_ADC_EXT2] = {drawSensorConfigGeneric,0,{}},

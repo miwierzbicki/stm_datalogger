@@ -92,7 +92,6 @@ void sd_writefile(char sdWriteBuff[100]) {
 	}
 	if(sdReady) {
 		fresult = f_open(&fil, "file1.txt", SD_SAVEMODE); // TU ZAPIS
-		/* Writing text */
 		f_puts(sdWriteBuff, &fil);
 		send_uart("<file written>\n\r");
 	}

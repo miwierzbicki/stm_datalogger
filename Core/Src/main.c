@@ -176,7 +176,7 @@ void send_uart_uint32(uint32_t value) {
 
 void send_uart_float(float value) {
     char buffer[20];
-    snprintf(buffer, sizeof(buffer), "%0.2f \n\r", value); // Formatuje wartość zmiennoprzecinkową z dwoma miejscami po przecinku
+    snprintf(buffer, sizeof(buffer), "%0.2f \n\r", value);
     HAL_UART_Transmit(&huart6, (uint8_t *)buffer, strlen(buffer), HAL_MAX_DELAY);
 }
 RTC_TimeTypeDef time;
@@ -254,11 +254,7 @@ int main(void)
   send_uart("\n\rfree: ");
   send_uart_uint32(sd_freespace());
   send_uart("\n\r");
-//  sd_writefile();
-//  sd_closefile();
-//  sd_readfile();
-//  sd_closefile();
-//  sd_demount();
+
   bool debug=true;
 
   /* USER CODE END 2 */
@@ -308,23 +304,6 @@ int main(void)
 		  }
 
 	  }
-
-//	  uint32_t valueAdc[2];
-//	  HAL_ADC_Start(&hadc1);
-//	  HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-//	  valueAdc[0] = HAL_ADC_GetValue(&hadc1);
-//
-//	  HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-//	  valueAdc[1] = HAL_ADC_GetValue(&hadc1);
-//	  //float voltage = 3.3f * valueAdc / 4096.0f;
-//	  int16_t prev_value;
-//	  int16_t value= __HAL_TIM_GET_COUNTER(&htim1);
-//	  if(value!=prev_value) {
-//	  sprintf(charAr, "%d, adc1: %lu, adc2: %lu \n\r", value, valueAdc[0], valueAdc[1]);
-//	  HAL_UART_Transmit(&huart6, (uint8_t *)charAr, strlen(charAr), HAL_MAX_DELAY);
-//	  prev_value=value;
-//	  }
-
 
 	displayMenu();
   }
@@ -899,7 +878,7 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
-	  send_uart("error handler loop");
+	  send_uart("error handler loop"); //dodane
   }
   /* USER CODE END Error_Handler_Debug */
 }
