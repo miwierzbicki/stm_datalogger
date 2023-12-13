@@ -43,8 +43,8 @@ Core/Src/sd.o: ../Core/Src/sd.c \
  C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306_fonts.h \
  ../Core/Inc/oled.h ../Core/Inc/menu.h ../Core/Inc/oled.h \
  ../Core/Inc/menu.h ../Core/Inc/main.h ../Core/Inc/ds18b20.h \
- ../Core/Inc/encoder.h ../Core/Inc/encoder.h ../Core/Inc/ds18b20.h \
- ../Core/Inc/main.h ../FATFS/App/fatfs.h \
+ ../Core/Inc/encoder.h ../Core/Inc/adc.h ../Core/Inc/encoder.h \
+ ../Core/Inc/ds18b20.h ../Core/Inc/main.h ../FATFS/App/fatfs.h \
  ../Middlewares/Third_Party/FatFs/src/ff.h \
  ../Middlewares/Third_Party/FatFs/src/integer.h ../FATFS/Target/ffconf.h \
  ../Middlewares/Third_Party/FatFs/src/ff_gen_drv.h \
@@ -99,6 +99,7 @@ C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306_fon
 ../Core/Inc/main.h:
 ../Core/Inc/ds18b20.h:
 ../Core/Inc/encoder.h:
+../Core/Inc/adc.h:
 ../Core/Inc/encoder.h:
 ../Core/Inc/ds18b20.h:
 ../Core/Inc/main.h:

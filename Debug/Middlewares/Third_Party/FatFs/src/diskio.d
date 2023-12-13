@@ -48,7 +48,7 @@ Middlewares/Third_Party/FatFs/src/diskio.o: \
  C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306.h \
  C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306_fonts.h \
  ../Core/Inc/oled.h ../Core/Inc/menu.h ../Core/Inc/main.h \
- ../Core/Inc/encoder.h
+ ../Core/Inc/encoder.h ../Core/Inc/adc.h
 ../Middlewares/Third_Party/FatFs/src/diskio.h:
 ../Middlewares/Third_Party/FatFs/src/integer.h:
 ../Middlewares/Third_Party/FatFs/src/ff_gen_drv.h:
@@ -102,3 +102,4 @@ C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306_fon
 ../Core/Inc/menu.h:
 ../Core/Inc/main.h:
 ../Core/Inc/encoder.h:
+../Core/Inc/adc.h:

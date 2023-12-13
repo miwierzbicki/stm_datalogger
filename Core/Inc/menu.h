@@ -11,6 +11,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include "encoder.h"
+#include "adc.h"
 
 typedef enum {
 	MAIN_MENU = 0,
@@ -43,6 +44,11 @@ typedef struct {
 	bool isEnabled;
 	uint16_t samplingRate;
 } Sensors;
+
+typedef struct {
+	char sensorName[20];
+	float (*function)();
+} MapSensors;
 
 void ch1Enable(void);
 void ch2Enable(void);

@@ -1,3 +1,11 @@
 ../Core/Src/adc.c:15:6:adc_int_init	1
 ../Core/Src/adc.c:19:6:adc_select_ch	2
 ../Core/Src/adc.c:31:6:getValAdc	1
+../Core/Src/adc.c:60:7:getValueAdcExtCh0	1
+../Core/Src/adc.c:63:7:getValueAdcExtCh1	1
+../Core/Src/adc.c:66:7:getValueAdcExtCh2	1
+../Core/Src/adc.c:69:7:getValueAdcExtCh3	1
+../Core/Src/adc.c:72:7:getValueAdcIntCh0	1
+../Core/Src/adc.c:75:7:getValueAdcIntCh1	1
+../Core/Src/adc.c:78:7:getValueAdcIntCh2	1
+../Core/Src/adc.c:81:7:getValueAdcIntCh3	1

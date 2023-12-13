@@ -173,6 +173,12 @@ void send_uart_uint32(uint32_t value) {
     snprintf(buffer, sizeof(buffer), "%lu \n\r", value);
     HAL_UART_Transmit(&huart6, (uint8_t *)buffer, strlen(buffer), HAL_MAX_DELAY);
 }
+
+void send_uart_float(float value) {
+    char buffer[20];
+    snprintf(buffer, sizeof(buffer), "%0.2f \n\r", value); // Formatuje wartość zmiennoprzecinkową z dwoma miejscami po przecinku
+    HAL_UART_Transmit(&huart6, (uint8_t *)buffer, strlen(buffer), HAL_MAX_DELAY);
+}
 RTC_TimeTypeDef time;
 RTC_DateTypeDef date;
 char* getRtcString(void)  {

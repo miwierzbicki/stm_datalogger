@@ -58,6 +58,7 @@ bool isClicked(void);
 //bool debug;
 void clearEncButton(void);
 void send_uart_uint32(uint32_t value);
+void send_uart_float(float value);
 void send_uart(char *string);
 char* getRtcString(void);
 extern RTC_TimeTypeDef time;

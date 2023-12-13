@@ -42,9 +42,10 @@ Core/Src/menu.o: ../Core/Src/menu.c ../Core/Inc/menu.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
  C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306_fonts.h \
  ../Core/Inc/oled.h ../Core/Inc/menu.h ../Core/Inc/main.h \
- ../Core/Inc/ds18b20.h ../Core/Inc/encoder.h ../Core/Inc/oled.h \
- ../Core/Inc/encoder.h ../Core/Inc/ds18b20.h ../Core/Inc/sd.h \
- ../FATFS/App/fatfs.h ../Middlewares/Third_Party/FatFs/src/ff.h \
+ ../Core/Inc/ds18b20.h ../Core/Inc/encoder.h ../Core/Inc/adc.h \
+ ../Core/Inc/oled.h ../Core/Inc/encoder.h ../Core/Inc/ds18b20.h \
+ ../Core/Inc/sd.h ../FATFS/App/fatfs.h \
+ ../Middlewares/Third_Party/FatFs/src/ff.h \
  ../Middlewares/Third_Party/FatFs/src/integer.h ../FATFS/Target/ffconf.h \
  ../Core/Inc/main.h ../Middlewares/Third_Party/FatFs/src/ff_gen_drv.h \
  ../Middlewares/Third_Party/FatFs/src/diskio.h \
@@ -98,6 +99,7 @@ C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306_fon
 ../Core/Inc/main.h:
 ../Core/Inc/ds18b20.h:
 ../Core/Inc/encoder.h:
+../Core/Inc/adc.h:
 ../Core/Inc/oled.h:
 ../Core/Inc/encoder.h:
 ../Core/Inc/ds18b20.h:

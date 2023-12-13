@@ -16,7 +16,7 @@ void adc_int_init(ADC_HandleTypeDef *hadc1) {
 	hadc1_new=hadc1;
 }
 
-void adc_select_ch(uint32_t channel) { //trzeba wywolywac za kazdym razem przed konwersją adc!!!!!!!!
+void adc_select_ch(uint32_t channel) { //trzeba wywolywac za kazdym razem przed konwersją adc bo inaczej będzie tylko ch0!!!!!!!!
 	//wartości channel = ADC_CHANNEL_0, 1, 2, 3
 	ADC_ChannelConfTypeDef sConfig = {0};
 	sConfig.Channel = channel;
@@ -55,4 +55,29 @@ void getValAdc(void) {
     voltage = 3.3f * value / 4096.0f;
     sprintf(adcStr, "a3=%lu (%.3f V)\n\r", value, voltage);
       send_uart(adcStr);
+}
+
+float getValueAdcExtCh0(void) {
+
+}
+float getValueAdcExtCh1(void) {
+
+}
+float getValueAdcExtCh2(void) {
+
+}
+float getValueAdcExtCh3(void) {
+
+}
+float getValueAdcIntCh0(void) {
+
+}
+float getValueAdcIntCh1(void) {
+
+}
+float getValueAdcIntCh2(void) {
+
+}
+float getValueAdcIntCh3(void) {
+
 }

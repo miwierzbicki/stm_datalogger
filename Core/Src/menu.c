@@ -131,6 +131,21 @@ Sensors sensors[] = {
 		{"DS18B20 #3", false, 0}
 };
 
+MapSensors mapSensors[] = {
+		{"ADC EXT CH0", getValueAdcExtCh0},
+		{"ADC EXT CH1", getValueAdcExtCh1},
+		{"ADC EXT CH2", getValueAdcExtCh2},
+		{"ADC EXT CH3", getValueAdcExtCh3},
+		{"ADC INT CH0", getValueAdcIntCh0},
+		{"ADC INT CH1", getValueAdcIntCh1},
+		{"ADC INT CH2", getValueAdcIntCh2},
+		{"ADC INT CH3", getValueAdcIntCh3},
+		{"DS18B20 #1", getValueDs1},
+		{"DS18B20 #2", getValueDs2},
+		{"DS18B20 #3", getValueDs3}
+
+};
+
 uint16_t samplingRates[] = {10,50,100,500};
 volatile uint8_t  samplingIndex = 0;
 volatile int counter=0;
@@ -178,6 +193,11 @@ void drawSensorConfigGeneric(Menu *menu) {
 void ch1Enable(void) {
 	for(int i=0; i<10; i++) {
 		if(sensors[i].samplingRate==10 && sensors[i].isEnabled) {
+			for(int j=0; j<sizeof(mapSensors)/sizeof(MapSensors); j++) {
+				if(strcmp(sensors[i].name, mapSensors[j].sensorName)==0) {
+					mapSensors[j].function();
+				}
+			}
 		  send_uart("10ms\n\r");
 		}
 	}

@@ -43,7 +43,7 @@ Core/Src/stm32f4xx_it.o: ../Core/Src/stm32f4xx_it.c ../Core/Inc/main.h \
  C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306.h \
  C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306_fonts.h \
  ../Core/Inc/oled.h ../Core/Inc/menu.h ../Core/Inc/main.h \
- ../Core/Inc/encoder.h ../Core/Inc/stm32f4xx_it.h
+ ../Core/Inc/encoder.h ../Core/Inc/adc.h ../Core/Inc/stm32f4xx_it.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
@@ -92,4 +92,5 @@ C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306_fon
 ../Core/Inc/menu.h:
 ../Core/Inc/main.h:
 ../Core/Inc/encoder.h:
+../Core/Inc/adc.h:
 ../Core/Inc/stm32f4xx_it.h:
