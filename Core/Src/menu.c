@@ -197,29 +197,41 @@ void drawSensorConfigGeneric(Menu *menu) {
 	drawSensorOptions(screen-SENSOR_CONFIG_ADC_EXT0);
 	backButton(2, MAIN_MENU, 2);
 }
-
-
+volatile char result[1000]="";
+volatile float value;
+volatile char temp[50];
 void ch1Enable(void) {
-	char result[1000]="";
-	char temp[50];
+
+
 	for(int i=0; i<10; i++) {
 		if(sensors[i].samplingRate==10 && sensors[i].isEnabled) {
 			for(int j=0; j<sizeof(mapSensors)/sizeof(MapSensors); j++) {
-				if(strcmp(sensors[i].name, mapSensors[j].sensorName)==0) {
-					float value = mapSensors[j].function();
-					 sprintf(temp, sizeof(temp), "%.3f;", value)
+				if(strcmp(sensors[i].name, mapSensors[j].sensorName)==0) { //zamiast tego
+					value = mapSensors[j].function();
+					 snprintf(temp, sizeof(temp), "%.3f;", value);
+					 strncat(result, temp, sizeof(result)-strlen(result)-1);
 					//zamiast tej mapSensors moznaby zrobic po prostu zmienna w kazdej funkcji pomiaru typu enabled i na tej podstawie bedzie latwiej laczyc stringa, bo z tym mapowaniem to nie wiem jak
 				}
 			}
 
 		}
+		else {
+
+		}
+
 	}
+	strncat(result, "\n\r", sizeof(result) - strlen(result) - 1);
+	CircularBuffer_Add(&cb, result);
+	memset(result, '\0', sizeof(result));
+	memset(temp, '\0', sizeof(result));
+	//strncat(result, "\n\r", sizeof(result) - strlen(result) - 1);
+
 }
 
 void ch2Enable(void) {
 	for(int i=0; i<10; i++) {
 		if(sensors[i].samplingRate==50 && sensors[i].isEnabled) {
-			send_uart(getRtcString());
+			//send_uart(getRtcString());
 			//
 
 		}
@@ -229,7 +241,7 @@ void ch2Enable(void) {
 void ch3Enable(void) {
 	for(int i=0; i<10; i++) {
 		if(sensors[i].samplingRate==100 && sensors[i].isEnabled) {
-		  send_uart("100ms\n\r");
+		  //send_uart("100ms\n\r");
 		}
 	}
 }
@@ -237,7 +249,7 @@ void ch3Enable(void) {
 void ch4Enable(void) {
 	for(int i=0; i<10; i++) {
 		if(sensors[i].samplingRate==500 && sensors[i].isEnabled) {
-		  send_uart("500ms\n\r");
+		  //send_uart("500ms\n\r");
 		}
 	}
 }

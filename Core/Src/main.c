@@ -122,7 +122,7 @@ void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim) {
     pulse = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
     ch1przerwanie=1;
     /* Set the Capture Compare Register value */
-      __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, (pulse + 6659)); //to wartosc pulse dla kazdego timera
+      __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, (pulse + 1659)); //to wartosc pulse dla kazdego timera
   }
 
   if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2) {
@@ -281,6 +281,9 @@ int main(void)
 			  //HAL_UART_Transmit(&huart6, (uint8_t *)"ch1 sie wykonal \n\r", strlen("ch1 sie wykonal \n\r"), HAL_MAX_DELAY);
 			  ch1Enable();
 			  ch1przerwanie=0;
+			  volatile const char *dataFromBuff = CircularBuffer_Read(&cb);
+			  send_uart(dataFromBuff);
+
 			  needToWrite=true;
 		  }
 		  if(ch2przerwanie==1) { //castowanie na uint8_t bo funkcja oczekuje wlasnie takiego typu

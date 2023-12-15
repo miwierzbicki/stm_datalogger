@@ -28,7 +28,7 @@ float getValueDs1(void) {
 		  rom_code[i] = wire_read();
 		float temp= ((rom_code[1]<<8) | (rom_code[0]));
 
-		send_uart_float(temp);
+		//send_uart_float(temp);
 		return temp = temp/16.0f;
 }
 
