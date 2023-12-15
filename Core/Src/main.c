@@ -194,51 +194,6 @@ char* getRtcString(void)  {
 	return dateTime;
 }
 
-#define ADS1115_ADDRESS 0x48
-unsigned char ADSwrite[6];
-int16_t reading;
-volatile float voltage[4];
-const float voltageConv = 6.114 / 32768.0;
-
-void adcExt(void) {
-
-	for(int i=0; i< 4; i++){
-				ADSwrite[0] = 0x01;
-
-				switch(i){
-					case(0):
-						ADSwrite[1] = 0xC1; //11000001
-					break;
-					case(1):
-						ADSwrite[1] = 0xD1; //11010001
-					break;
-					case(2):
-						ADSwrite[1] = 0xE1;
-					break;
-					case(3):
-						ADSwrite[1] = 0xF1;
-					break;
-				}
-
-				ADSwrite[2] = 0x83; //10000011 LSB
-
-				HAL_I2C_Master_Transmit(&hi2c2, ADS1115_ADDRESS << 1, ADSwrite, 3, 100);
-				ADSwrite[0] = 0x00;
-				HAL_I2C_Master_Transmit(&hi2c2, ADS1115_ADDRESS << 1 , ADSwrite, 1 ,100);
-				HAL_Delay(5);
-
-				HAL_I2C_Master_Receive(&hi2c2, ADS1115_ADDRESS <<1, ADSwrite, 2, 100);
-				reading = (ADSwrite[0] << 8 | ADSwrite[1] );
-				if(reading < 0) {
-					reading = 0;
-				}
-				voltage[i] = reading * voltageConv;
-
-			}
-	char str[20];
-	sprintf(str, "%lu \n\r", voltage[0]);
-	send_uart(str);
-}
 
 
 /* USER CODE END 0 */
@@ -287,7 +242,7 @@ int main(void)
 
   ds18_init(&htim10);
   adc_int_init(&hadc1);
-  adc_ext_init(&hi2c1);
+  adc_ext_init(&hi2c2);
   huart_ds_init(&huart6);
   sendRtcHandler(&hrtc);
   HAL_TIM_Base_Start(&htim10);
@@ -319,7 +274,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  adcExt();
+
 	  if(debug) {
 		  bool needToWrite=false;
 		  if(ch1przerwanie==1) {

@@ -49,7 +49,7 @@ void listAllItemsFromMenu(Menu *menu) {
 }
 
 void drawMainMenu(Menu *menu) {
-	encSetRange(0, 3);
+	encSetRange(0, 4);
 	listAllItemsFromMenu(menu);
 	uint32_t encVal = encoderGet();
 	char charArVal[4];
@@ -200,12 +200,15 @@ void drawSensorConfigGeneric(Menu *menu) {
 
 
 void ch1Enable(void) {
+	char result[1000]="";
+	char temp[50];
 	for(int i=0; i<10; i++) {
 		if(sensors[i].samplingRate==10 && sensors[i].isEnabled) {
 			for(int j=0; j<sizeof(mapSensors)/sizeof(MapSensors); j++) {
 				if(strcmp(sensors[i].name, mapSensors[j].sensorName)==0) {
-					mapSensors[j].function();
-					 send_uart("ch1\n\r");
+					float value = mapSensors[j].function();
+					 sprintf(temp, sizeof(temp), "%.3f;", value)
+					//zamiast tej mapSensors moznaby zrobic po prostu zmienna w kazdej funkcji pomiaru typu enabled i na tej podstawie bedzie latwiej laczyc stringa, bo z tym mapowaniem to nie wiem jak
 				}
 			}
 
@@ -240,7 +243,7 @@ void ch4Enable(void) {
 }
 
 
-void debugAdc(Menu *menu) {
+void debugAdcInt(Menu *menu) {
 	encSetRange(0,1);
 	ssd1306_SetCursor(0, 0);
 	char str[40];
@@ -255,12 +258,28 @@ void debugAdc(Menu *menu) {
 	ssd1306_SetCursor(0, 30);
 	sprintf(str, "int_ch3=%.3f V", getValueAdcIntCh3());
 	ssd1306_WriteString(str, Font_7x10, White);
-	ssd1306_SetCursor(0, 40);
-	sprintf(str, "ext_ch0=%.3f V", getValueAdcExtCh0());
-	ssd1306_WriteString(str, Font_7x10, White);
+
 	ssd1306_SetCursor(0, 50);
 	sprintf(str, "ds18_2=%.2f C", getValueDs2());
 	ssd1306_WriteString(str, Font_7x10, White);
+	backButton(1, MAIN_MENU, 1);
+}
+
+void debugAdcExt(Menu *menu) {
+	char str[40];
+	sprintf(str, "ext_ch0=%.3f V", getValueAdcExtCh0());
+	ssd1306_SetCursor(0, 0);
+	ssd1306_WriteString(str, Font_7x10, White);
+	ssd1306_SetCursor(0, 10);
+	sprintf(str, "ext_ch1=%.3f V", getValueAdcExtCh1());
+	ssd1306_WriteString(str, Font_7x10, White);
+	ssd1306_SetCursor(0, 20);
+	sprintf(str, "ext_ch2=%.3f V", getValueAdcExtCh2());
+	ssd1306_WriteString(str, Font_7x10, White);
+	ssd1306_SetCursor(0, 30);
+	sprintf(str, "ext_ch3=%.3f V", getValueAdcExtCh3());
+	ssd1306_WriteString(str, Font_7x10, White);
+
 	backButton(1, MAIN_MENU, 1);
 }
 
@@ -329,11 +348,12 @@ void drawOnoffMeasure(Menu *menu) {
 
 
 Menu menu[] = {
-	[MAIN_MENU]={drawMainMenu, 4,
+	[MAIN_MENU]={drawMainMenu, 5,
 			{{SENSOR_CONFIG, "Konfig. czuj."},
 			{SD_CONFIG, "SD konfig."},
 			{ONOFF_MEASURE, "Start pomiaru"},
-			{DEBUG_ADC, "Debug ADC"}
+			{DEBUG_ADC_INT, "Debug ADC INT"},
+			{DEBUG_ADC_EXT, "Debug ADC_EXT"}
 			}
 	},
 	[SENSOR_CONFIG]={drawSensorConfig, 3,
@@ -379,7 +399,8 @@ Menu menu[] = {
 	[SENSOR_CONFIG_DS18_3] = {drawSensorConfigGeneric,0,{}},
 	[SD_CONFIG] = {drawSdConfig, 0, {}},
 	[ONOFF_MEASURE] = {drawOnoffMeasure, 0, {}},
-	[DEBUG_ADC] = {debugAdc, 0, {}}
+	[DEBUG_ADC_INT] = {debugAdcInt, 0, {}},
+	[DEBUG_ADC_EXT] = {debugAdcExt, 0, {}}
 };
 
 void displayMenu(void) {
