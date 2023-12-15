@@ -14,6 +14,7 @@
 #include "fatfs.h"
 
 extern bool sdReady;
+extern volatile FRESULT fresult;
 extern BYTE SD_SAVEMODE;
 void sd_init();
 uint32_t sd_totalspace();
@@ -22,3 +23,4 @@ void sd_readfile();
 void sd_writefile();
 void sd_closefile();
 void sd_demount();
+const char* getFresultString(FRESULT fr);

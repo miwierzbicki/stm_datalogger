@@ -4,4 +4,5 @@
 ../Core/Src/sd.c:58:10:sd_totalspace	8	static
 ../Core/Src/sd.c:69:6:sd_readfile	8	static
 ../Core/Src/sd.c:86:6:sd_writefile	16	static
-../Core/Src/sd.c:101:6:sd_closefile	8	static
+../Core/Src/sd.c:100:6:sd_closefile	8	static
+../Core/Src/sd.c:107:13:getFresultString	16	static

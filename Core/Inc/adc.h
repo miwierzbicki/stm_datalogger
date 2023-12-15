@@ -21,3 +21,4 @@ float getValueAdcIntCh2(void);
 float getValueAdcIntCh3(void);
 void adc_int_init(ADC_HandleTypeDef *hadc1);
 void getValAdc(void);
+void adc_ext_init(I2C_HandleTypeDef *hi2c2);
