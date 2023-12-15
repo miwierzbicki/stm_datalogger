@@ -46,7 +46,11 @@ typedef struct {
 	char name[20];
 	bool isEnabled;
 	uint16_t samplingRate;
+	float lastValue;
+	bool hasValue;
 } Sensors;
+
+extern Sensors sensors[];
 
 typedef struct {
 	char sensorName[20];

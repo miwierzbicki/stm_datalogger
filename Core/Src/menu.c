@@ -127,17 +127,17 @@ void drawSensorConfigDS18(Menu *menu) {
 
 
 Sensors sensors[] = {
-		{"ADC EXT CH0", false, 0},
-		{"ADC EXT CH1", false, 0},
-		{"ADC EXT CH2", false, 0},
-		{"ADC EXT CH3", false, 0},
-		{"ADC INT CH0", false, 0},
-		{"ADC INT CH1", false, 0},
-		{"ADC INT CH2", false, 0},
-		{"ADC INT CH3", false, 0},
-		{"DS18B20 #1", false, 0},
-		{"DS18B20 #2", false, 0},
-		{"DS18B20 #3", false, 0}
+		{"ADC EXT CH0", false, 0, 0.0, false},
+		{"ADC EXT CH1", false, 0, 0.0, false},
+		{"ADC EXT CH2", false, 0, 0.0, false},
+		{"ADC EXT CH3", false, 0, 0.0, false},
+		{"ADC INT CH0", false, 0, 0.0, false},
+		{"ADC INT CH1", false, 0, 0.0, false},
+		{"ADC INT CH2", false, 0, 0.0, false},
+		{"ADC INT CH3", false, 0, 0.0, false},
+		{"DS18B20 #1", false, 0, 0.0, false},
+		{"DS18B20 #2", false, 0, 0.0, false},
+		{"DS18B20 #3", false, 0, 0.0, false}
 };
 
 MapSensors mapSensors[] = {
@@ -208,8 +208,10 @@ void ch1Enable(void) {
 			for(int j=0; j<sizeof(mapSensors)/sizeof(MapSensors); j++) {
 				if(strcmp(sensors[i].name, mapSensors[j].sensorName)==0) { //zamiast tego
 					value = mapSensors[j].function();
-					 snprintf(temp, sizeof(temp), "%.3f;", value);
-					 strncat(result, temp, sizeof(result)-strlen(result)-1);
+					sensors[i].lastValue=value;
+					sensors[i].hasValue=true;
+//					 snprintf(temp, sizeof(temp), "%.3f;", value);
+//					 strncat(result, temp, sizeof(result)-strlen(result)-1);
 					//zamiast tej mapSensors moznaby zrobic po prostu zmienna w kazdej funkcji pomiaru typu enabled i na tej podstawie bedzie latwiej laczyc stringa, bo z tym mapowaniem to nie wiem jak
 				}
 			}
@@ -220,10 +222,10 @@ void ch1Enable(void) {
 		}
 
 	}
-	strncat(result, "\n\r", sizeof(result) - strlen(result) - 1);
-	CircularBuffer_Add(&cb, result);
-	memset(result, '\0', sizeof(result));
-	memset(temp, '\0', sizeof(result));
+//	strncat(result, "\n\r", sizeof(result) - strlen(result) - 1);
+//	CircularBuffer_Add(&cb, result);
+//	memset(result, '\0', sizeof(result));
+//	memset(temp, '\0', sizeof(result));
 	//strncat(result, "\n\r", sizeof(result) - strlen(result) - 1);
 
 }

@@ -307,6 +307,47 @@ int main(void)
 		  }
 		  if(needToWrite) {
 			  //tu sklejanie stringa z wynikami wszystkich pomiarów i wysłanie na bufor kołowy
+//			  char finalResults[2048] = ""; // Duży bufor na końcowy string
+//			  char temp[100]; // Tymczasowy bufor
+//
+//			  for (int i = 0; i < 11; i++) {
+//				  if (sensors[i].hasValue) {
+//					  snprintf(temp, sizeof(temp), "%s: %f\n", sensors[i].name, sensors[i].lastValue);
+//				  } else {
+//					  snprintf(temp, sizeof(temp), "%s: NULL\n", sensors[i].name);
+//				  }
+//				  strncat(finalResults, temp, sizeof(finalResults) - strlen(finalResults) - 1);
+//				  sensors[i].hasValue = false; // Resetowanie flagi
+//			  }
+
+
+			  char finalResults[2048] = ""; // Duży bufor na końcowy string
+			      char temp[100]; // Tymczasowy bufor
+
+			      for (int i = 0; i < 11; i++) {
+			          if (sensors[i].hasValue) {
+			              snprintf(temp, sizeof(temp), "%f", sensors[i].lastValue);
+			          } else {
+			              snprintf(temp, sizeof(temp), "NULL");
+			          }
+			          strncat(finalResults, temp, sizeof(finalResults) - strlen(finalResults) - 1);
+
+			          // Dodaj przecinek, chyba że to ostatni element
+			          //if (i < sizeof(sensors) / sizeof(Sensors) - 1) {
+			              strncat(finalResults, ",", sizeof(finalResults) - strlen(finalResults) - 1);
+			          //}
+
+			          sensors[i].hasValue = false; // Resetowanie flagi
+			      }
+
+			      // Dodaj znak nowej linii i powrotu karetki na końcu sklejonego stringa
+			      strncat(finalResults, "\n\r", sizeof(finalResults) - strlen(finalResults) - 1);
+
+			      // Dodaj finalResults do bufora kołowego
+			      CircularBuffer_Add(&cb, finalResults);
+
+
+
 		  }
 
 	  }
