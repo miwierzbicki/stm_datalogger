@@ -122,14 +122,14 @@ void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim) {
     pulse = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
     ch1przerwanie=1;
     /* Set the Capture Compare Register value */
-      __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, (pulse + 4659)); //to wartosc pulse dla kazdego timera
+      __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, (pulse + 2659)); //to wartosc pulse dla kazdego timera
   }
 
   if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2) {
   pulse = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
   ch2przerwanie=1;
   /* Set the Capture Compare Register value */ //z github https://github.com/cnoviello/mastering-stm32-2nd/blame/2183a2c5fe25fd9229abd21dab4f23658036dd3f/Nucleo-L476RG/CH11/Core/Src/main-ex7.c#L61
-    __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_2, (pulse + 13500));
+    __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_2, (pulse + 9318));
   }
 
   if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3) {
@@ -278,89 +278,56 @@ int main(void)
 	  if(debug) {
 		  bool needToWrite=false;
 		  if(ch1przerwanie==1) {
-			  //HAL_UART_Transmit(&huart6, (uint8_t *)"ch1 sie wykonal \n\r", strlen("ch1 sie wykonal \n\r"), HAL_MAX_DELAY);
 			  ch1Enable();
 			  ch1przerwanie=0;
-
-
 			  needToWrite=true;
 		  }
-		  if(ch2przerwanie==1) { //castowanie na uint8_t bo funkcja oczekuje wlasnie takiego typu
-			  //HAL_UART_Transmit(&huart6, (uint8_t *)"ch2 sie wykonal \n\r", strlen("ch2 sie wykonal \n\r"), HAL_MAX_DELAY);
-
-
+		  if(ch2przerwanie==1) {
 			  ch2przerwanie=0;
 			  ch2Enable();
 			  needToWrite=true;
 		  }
 		  if(ch3przerwanie==1) {
-			  //HAL_UART_Transmit(&huart6, (uint8_t *)"ch3 sie wykonal \n\r", strlen("ch3 sie wykonal \n\r"), HAL_MAX_DELAY);
-
 			  ch3przerwanie=0;
 			  ch3Enable();
 			  needToWrite=true;
 			  }
 		  if(ch4przerwanie==1) {
-			  //HAL_UART_Transmit(&huart6, (uint8_t *)"ch4 sie wykonal \n\r", strlen("ch4 sie wykonal \n\r"), HAL_MAX_DELAY);
-
 			  ch4przerwanie=0;
 			  ch4Enable();
 			  needToWrite=true;
 		  }
 		  if(needToWrite) {
-			  //tu sklejanie stringa z wynikami wszystkich pomiarów i wysłanie na bufor kołowy
-//			  char finalResults[2048] = ""; // Duży bufor na końcowy string
-//			  char temp[100]; // Tymczasowy bufor
-//
-//			  for (int i = 0; i < 11; i++) {
-//				  if (sensors[i].hasValue) {
-//					  snprintf(temp, sizeof(temp), "%s: %f\n", sensors[i].name, sensors[i].lastValue);
-//				  } else {
-//					  snprintf(temp, sizeof(temp), "%s: NULL\n", sensors[i].name);
-//				  }
-//				  strncat(finalResults, temp, sizeof(finalResults) - strlen(finalResults) - 1);
-//				  sensors[i].hasValue = false; // Resetowanie flagi
-//			  }
-
 			  char* dateTimeStr = getRtcString();
+			  char finalResults[2048] = "";
+			  char temp[100];
+			  bool allNulls=true;
+			  snprintf(finalResults, sizeof(finalResults), "%s,", dateTimeStr);
 
-			  char finalResults[2048] = ""; // Duży bufor na końcowy string
-			      char temp[100]; // Tymczasowy bufor
-			      bool allNulls=true;
-			      snprintf(finalResults, sizeof(finalResults), "%s,", dateTimeStr);
-			      for (int i = 0; i < 11; i++) {
-			          if (sensors[i].hasValue) {
-			              snprintf(temp, sizeof(temp), "%f", sensors[i].lastValue);
-			              allNulls=false;
-			          } else {
-			              snprintf(temp, sizeof(temp), "NULL");
-			          }
-			          strncat(finalResults, temp, sizeof(finalResults) - strlen(finalResults) - 1);
+			  for (int i = 0; i < 11; i++) {
+				  if (sensors[i].hasValue) {
+					  snprintf(temp, sizeof(temp), "%f", sensors[i].lastValue);
+					  allNulls=false;
+				  } else {
+					  snprintf(temp, sizeof(temp), "");
+				  }
+				  strncat(finalResults, temp, sizeof(finalResults) - strlen(finalResults) - 1);
 
-			          // Dodaj przecinek, chyba że to ostatni element
-			          //if (i < sizeof(sensors) / sizeof(Sensors) - 1) {
-			              strncat(finalResults, ",", sizeof(finalResults) - strlen(finalResults) - 1);
-			          //}
-
-			          sensors[i].hasValue = false; // Resetowanie flagi
-			      }
-
-			      // Dodaj znak nowej linii i powrotu karetki na końcu sklejonego stringa
+				  // Dodaj przecinek, chyba że to ostatni element
+				  if (i < 10) {
+					  strncat(finalResults, ",", sizeof(finalResults) - strlen(finalResults) - 1);
+				  }
+				  sensors[i].hasValue = false; // Resetowanie flagi
+			  }
 			      strncat(finalResults, "\n\r", sizeof(finalResults) - strlen(finalResults) - 1);
-
-			      // Dodaj finalResults do bufora kołowego
 			      if(!allNulls) {
 			    	  CircularBuffer_Add(&cb, finalResults);
 			      }
-
 			      volatile const char *dataFromBuff = CircularBuffer_Read(&cb);
 				  send_uart(dataFromBuff);
-
-
+			      //send_uart(finalResults);
 		  }
-
 	  }
-
 	displayMenu();
   }
   /* USER CODE END 3 */

@@ -203,44 +203,29 @@ volatile char temp[50];
 void ch1Enable(void) {
 
 
-	for(int i=0; i<10; i++) {
+	for(int i=0; i<11; i++) {
 		if(sensors[i].samplingRate==10 && sensors[i].isEnabled) {
 			for(int j=0; j<sizeof(mapSensors)/sizeof(MapSensors); j++) {
 				if(strcmp(sensors[i].name, mapSensors[j].sensorName)==0) { //zamiast tego
 					value = mapSensors[j].function();
 					sensors[i].lastValue=value;
 					sensors[i].hasValue=true;
-//					 snprintf(temp, sizeof(temp), "%.3f;", value);
-//					 strncat(result, temp, sizeof(result)-strlen(result)-1);
-					//zamiast tej mapSensors moznaby zrobic po prostu zmienna w kazdej funkcji pomiaru typu enabled i na tej podstawie bedzie latwiej laczyc stringa, bo z tym mapowaniem to nie wiem jak
 				}
 			}
-
 		}
 		else {
-
 		}
-
 	}
-//	strncat(result, "\n\r", sizeof(result) - strlen(result) - 1);
-//	CircularBuffer_Add(&cb, result);
-//	memset(result, '\0', sizeof(result));
-//	memset(temp, '\0', sizeof(result));
-	//strncat(result, "\n\r", sizeof(result) - strlen(result) - 1);
-
 }
 
 void ch2Enable(void) {
-	for(int i=0; i<10; i++) {
+	for(int i=0; i<11; i++) {
 			if(sensors[i].samplingRate==50 && sensors[i].isEnabled) {
 				for(int j=0; j<sizeof(mapSensors)/sizeof(MapSensors); j++) {
 					if(strcmp(sensors[i].name, mapSensors[j].sensorName)==0) { //zamiast tego
 						value = mapSensors[j].function();
 						sensors[i].lastValue=value;
 						sensors[i].hasValue=true;
-	//					 snprintf(temp, sizeof(temp), "%.3f;", value);
-	//					 strncat(result, temp, sizeof(result)-strlen(result)-1);
-						//zamiast tej mapSensors moznaby zrobic po prostu zmienna w kazdej funkcji pomiaru typu enabled i na tej podstawie bedzie latwiej laczyc stringa, bo z tym mapowaniem to nie wiem jak
 					}
 				}
 
@@ -253,16 +238,14 @@ void ch2Enable(void) {
 }
 
 void ch3Enable(void) {
-	for(int i=0; i<10; i++) {
+	for(int i=0; i<11; i++) {
 			if(sensors[i].samplingRate==100 && sensors[i].isEnabled) {
 				for(int j=0; j<sizeof(mapSensors)/sizeof(MapSensors); j++) {
 					if(strcmp(sensors[i].name, mapSensors[j].sensorName)==0) { //zamiast tego
 						value = mapSensors[j].function();
 						sensors[i].lastValue=value;
 						sensors[i].hasValue=true;
-	//					 snprintf(temp, sizeof(temp), "%.3f;", value);
-	//					 strncat(result, temp, sizeof(result)-strlen(result)-1);
-						//zamiast tej mapSensors moznaby zrobic po prostu zmienna w kazdej funkcji pomiaru typu enabled i na tej podstawie bedzie latwiej laczyc stringa, bo z tym mapowaniem to nie wiem jak
+
 					}
 				}
 
@@ -275,16 +258,13 @@ void ch3Enable(void) {
 }
 
 void ch4Enable(void) {
-	for(int i=0; i<10; i++) {
+	for(int i=0; i<11; i++) {
 			if(sensors[i].samplingRate==500 && sensors[i].isEnabled) {
 				for(int j=0; j<sizeof(mapSensors)/sizeof(MapSensors); j++) {
 					if(strcmp(sensors[i].name, mapSensors[j].sensorName)==0) { //zamiast tego
 						value = mapSensors[j].function();
 						sensors[i].lastValue=value;
 						sensors[i].hasValue=true;
-	//					 snprintf(temp, sizeof(temp), "%.3f;", value);
-	//					 strncat(result, temp, sizeof(result)-strlen(result)-1);
-						//zamiast tej mapSensors moznaby zrobic po prostu zmienna w kazdej funkcji pomiaru typu enabled i na tej podstawie bedzie latwiej laczyc stringa, bo z tym mapowaniem to nie wiem jak
 					}
 				}
 
@@ -337,6 +317,14 @@ void debugAdcExt(Menu *menu) {
 	backButton(1, MAIN_MENU, 1);
 }
 
+void testAllSensors(Menu *menu) {
+	int numSensors = sizeof(sensors) / sizeof(sensors[0]);
+	    for (int i = 0; i < numSensors; ++i) {
+	        sensors[i].isEnabled = true;
+	        sensors[i].samplingRate = 10;
+	    }
+	backButton(1, MAIN_MENU, 1);
+}
 
 void drawOnoffMeasure(Menu *menu) {
 
@@ -369,11 +357,9 @@ void drawOnoffMeasure(Menu *menu) {
 	ssd1306_WriteString("WRITE buff", Font_7x10, entrySelected(0) ? Black : White);
 	extern CircularBuffer cb;
 	if(entrySelected(0) && entryClicked(0)) {
-		float val=ds18_get_temp();
-		char str[20];
-		sprintf(str, "%f\n\r", val);
 
-		CircularBuffer_Add(&cb, str);
+
+		//CircularBuffer_Add(&cb, str);
 //		sd_writefile("test;test;123;123.4;0.0 ");
 //		sd_closefile();
 	}
@@ -452,7 +438,7 @@ Menu menu[] = {
 	[SENSOR_CONFIG_DS18_2] = {drawSensorConfigGeneric,0,{}},
 	[SENSOR_CONFIG_DS18_3] = {drawSensorConfigGeneric,0,{}},
 	[SD_CONFIG] = {drawSdConfig, 0, {}},
-	[ONOFF_MEASURE] = {drawOnoffMeasure, 0, {}},
+	[ONOFF_MEASURE] = {testAllSensors, 0, {}},
 	[DEBUG_ADC_INT] = {debugAdcInt, 0, {}},
 	[DEBUG_ADC_EXT] = {debugAdcExt, 0, {}}
 };

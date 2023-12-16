@@ -12,8 +12,7 @@
 
 float getValueDs1(void);
 float getValueDs2(void);
-float getValueDs3(void); //te uzupelnic!
-float ds18_get_temp(void);
+float getValueDs3(void);
 void delay_us(uint32_t us);
 void ds18_init(TIM_HandleTypeDef *htim10);
 

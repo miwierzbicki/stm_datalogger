@@ -11,7 +11,7 @@
 #include "encoder.h"
 
 #define BUF_SIZE 100
-#define STR_SIZE 100
+#define STR_SIZE 1000
 
 
 typedef struct {
