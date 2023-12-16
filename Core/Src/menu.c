@@ -232,28 +232,68 @@ void ch1Enable(void) {
 
 void ch2Enable(void) {
 	for(int i=0; i<10; i++) {
-		if(sensors[i].samplingRate==50 && sensors[i].isEnabled) {
-			//send_uart(getRtcString());
-			//
+			if(sensors[i].samplingRate==50 && sensors[i].isEnabled) {
+				for(int j=0; j<sizeof(mapSensors)/sizeof(MapSensors); j++) {
+					if(strcmp(sensors[i].name, mapSensors[j].sensorName)==0) { //zamiast tego
+						value = mapSensors[j].function();
+						sensors[i].lastValue=value;
+						sensors[i].hasValue=true;
+	//					 snprintf(temp, sizeof(temp), "%.3f;", value);
+	//					 strncat(result, temp, sizeof(result)-strlen(result)-1);
+						//zamiast tej mapSensors moznaby zrobic po prostu zmienna w kazdej funkcji pomiaru typu enabled i na tej podstawie bedzie latwiej laczyc stringa, bo z tym mapowaniem to nie wiem jak
+					}
+				}
+
+			}
+			else {
+
+			}
 
 		}
-	}
 }
 
 void ch3Enable(void) {
 	for(int i=0; i<10; i++) {
-		if(sensors[i].samplingRate==100 && sensors[i].isEnabled) {
-		  //send_uart("100ms\n\r");
+			if(sensors[i].samplingRate==100 && sensors[i].isEnabled) {
+				for(int j=0; j<sizeof(mapSensors)/sizeof(MapSensors); j++) {
+					if(strcmp(sensors[i].name, mapSensors[j].sensorName)==0) { //zamiast tego
+						value = mapSensors[j].function();
+						sensors[i].lastValue=value;
+						sensors[i].hasValue=true;
+	//					 snprintf(temp, sizeof(temp), "%.3f;", value);
+	//					 strncat(result, temp, sizeof(result)-strlen(result)-1);
+						//zamiast tej mapSensors moznaby zrobic po prostu zmienna w kazdej funkcji pomiaru typu enabled i na tej podstawie bedzie latwiej laczyc stringa, bo z tym mapowaniem to nie wiem jak
+					}
+				}
+
+			}
+			else {
+
+			}
+
 		}
-	}
 }
 
 void ch4Enable(void) {
 	for(int i=0; i<10; i++) {
-		if(sensors[i].samplingRate==500 && sensors[i].isEnabled) {
-		  //send_uart("500ms\n\r");
+			if(sensors[i].samplingRate==500 && sensors[i].isEnabled) {
+				for(int j=0; j<sizeof(mapSensors)/sizeof(MapSensors); j++) {
+					if(strcmp(sensors[i].name, mapSensors[j].sensorName)==0) { //zamiast tego
+						value = mapSensors[j].function();
+						sensors[i].lastValue=value;
+						sensors[i].hasValue=true;
+	//					 snprintf(temp, sizeof(temp), "%.3f;", value);
+	//					 strncat(result, temp, sizeof(result)-strlen(result)-1);
+						//zamiast tej mapSensors moznaby zrobic po prostu zmienna w kazdej funkcji pomiaru typu enabled i na tej podstawie bedzie latwiej laczyc stringa, bo z tym mapowaniem to nie wiem jak
+					}
+				}
+
+			}
+			else {
+
+			}
+
 		}
-	}
 }
 
 

@@ -12,9 +12,9 @@
 ../Core/Src/menu.c:194:6:drawSensorConfigGeneric	16	static
 ../Core/Src/menu.c:203:6:ch1Enable	16	static
 ../Core/Src/menu.c:233:6:ch2Enable	16	static
-../Core/Src/menu.c:243:6:ch3Enable	16	static
-../Core/Src/menu.c:251:6:ch4Enable	16	static
-../Core/Src/menu.c:260:6:debugAdcInt	56	static
-../Core/Src/menu.c:282:6:debugAdcExt	56	static
-../Core/Src/menu.c:301:6:drawOnoffMeasure	80	static
-../Core/Src/menu.c:420:6:displayMenu	8	static
+../Core/Src/menu.c:255:6:ch3Enable	16	static
+../Core/Src/menu.c:277:6:ch4Enable	16	static
+../Core/Src/menu.c:300:6:debugAdcInt	56	static
+../Core/Src/menu.c:322:6:debugAdcExt	56	static
+../Core/Src/menu.c:341:6:drawOnoffMeasure	80	static
+../Core/Src/menu.c:460:6:displayMenu	8	static
