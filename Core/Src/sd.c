@@ -29,6 +29,7 @@ bool sdReady = false;
 // functions
 void sd_demount() {
 	f_mount(NULL, "", 0);
+	send_uart("<drive unmounted>");
 }
 
 void sd_init() {
@@ -83,16 +84,18 @@ void sd_readfile() {
 }
 volatile BYTE SD_SAVEMODE;
 
-void sd_writefile(char sdWriteBuff[100]) {
-	if(dataOverwrite) {
+void sd_writefile(char sdWriteBuff[500]) {
+	if(dataOverwrite) { //to nie dziala poprawnie, przy kazdym zapisie czysci kartę
 		SD_SAVEMODE = FA_CREATE_ALWAYS | FA_READ | FA_WRITE;
 	}
 	else {
 		SD_SAVEMODE = FA_OPEN_APPEND | FA_READ | FA_WRITE;
 	}
 	if(sdReady) {
-		fresult = f_open(&fil, "file1.txt", SD_SAVEMODE); // TU ZAPIS
+		fresult = f_open(&fil, "file1.txt", SD_SAVEMODE);
 		f_puts(sdWriteBuff, &fil);
+		f_sync(&fil);
+		sd_closefile();
 		send_uart("<file written>\n\r");
 	}
 }

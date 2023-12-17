@@ -64,6 +64,7 @@ char* getRtcString(void);
 extern RTC_TimeTypeDef time;
 extern RTC_DateTypeDef date;
 char* getRtcString(void);
+extern bool debug;
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

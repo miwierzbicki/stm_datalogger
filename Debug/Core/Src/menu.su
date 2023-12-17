@@ -17,5 +17,5 @@
 ../Core/Src/menu.c:280:6:debugAdcInt	56	static
 ../Core/Src/menu.c:302:6:debugAdcExt	56	static
 ../Core/Src/menu.c:320:6:testAllSensors	24	static
-../Core/Src/menu.c:329:6:drawOnoffMeasure	56	static
-../Core/Src/menu.c:446:6:displayMenu	8	static
+../Core/Src/menu.c:331:6:drawOnoffMeasure	48	static
+../Core/Src/menu.c:458:6:displayMenu	8	static

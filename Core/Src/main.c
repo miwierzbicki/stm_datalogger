@@ -122,7 +122,7 @@ void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim) {
     pulse = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
     ch1przerwanie=1;
     /* Set the Capture Compare Register value */
-      __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, (pulse + 2659)); //to wartosc pulse dla kazdego timera
+      __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, (pulse + 999)); //to wartosc pulse dla kazdego timera
   }
 
   if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2) {
@@ -194,7 +194,8 @@ char* getRtcString(void)  {
 	return dateTime;
 }
 
-
+bool debug;
+volatile const char *dataFromBuff;
 
 /* USER CODE END 0 */
 
@@ -257,7 +258,7 @@ int main(void)
   send_uart_uint32(sd_freespace());
   send_uart("\n\r");
 
-  bool debug=true;
+  debug=false;
 
   /* USER CODE END 2 */
 
@@ -319,12 +320,14 @@ int main(void)
 				  }
 				  sensors[i].hasValue = false; // Resetowanie flagi
 			  }
-			      strncat(finalResults, "\n\r", sizeof(finalResults) - strlen(finalResults) - 1);
+			      strncat(finalResults, "\n", sizeof(finalResults) - strlen(finalResults) - 1);
 			      if(!allNulls) {
 			    	  CircularBuffer_Add(&cb, finalResults);
 			      }
-			      volatile const char *dataFromBuff = CircularBuffer_Read(&cb);
+
+			      dataFromBuff = CircularBuffer_Read(&cb);
 				  send_uart(dataFromBuff);
+				  sd_writefile(dataFromBuff);
 			      //send_uart(finalResults);
 		  }
 	  }
@@ -357,7 +360,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
   RCC_OscInitStruct.PLL.PLLM = 8;
-  RCC_OscInitStruct.PLL.PLLN = 80;
+  RCC_OscInitStruct.PLL.PLLN = 100;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
@@ -374,7 +377,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
   {
     Error_Handler();
   }

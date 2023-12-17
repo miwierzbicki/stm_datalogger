@@ -326,13 +326,15 @@ void testAllSensors(Menu *menu) {
 	backButton(1, MAIN_MENU, 1);
 }
 
+char *measureStatusStr="";
+
 void drawOnoffMeasure(Menu *menu) {
 
 	uint8_t currPos;
 	if(!sdReady) {
 		ssd1306_SetCursor(0, 0);
-		ssd1306_WriteString("SD NOT READY!", Font_6x8, White);
-		ssd1306_SetCursor(0, 8);
+		ssd1306_WriteString("SD ERROR!", Font_11x18, White);
+		ssd1306_SetCursor(0, 18);
 		currPos=0;
 	}
 	else {
@@ -343,41 +345,51 @@ void drawOnoffMeasure(Menu *menu) {
 
 	char sensorDetailsStr[30];
 	encSetRange(0,2);
-	for(int i=0; i<11; i++) {
-		if(sensors[i].isEnabled) {
-			sprintf(sensorDetailsStr, "%s: %d\n\r", sensors[i].name, sensors[i].samplingRate);
-			ssd1306_SetCursor(0, currPos+8);
-			currPos=currPos+8;
-			ssd1306_WriteString(sensorDetailsStr, Font_6x8, White); //za mało miejsca na ekranie -> (???)
-		}
-	}
+//	for(int i=0; i<11; i++) {
+//		if(sensors[i].isEnabled) {
+//			sprintf(sensorDetailsStr, "%s: %d\n\r", sensors[i].name, sensors[i].samplingRate);
+//			ssd1306_SetCursor(0, currPos+8);
+//			currPos=currPos+8;
+//			ssd1306_WriteString(sensorDetailsStr, Font_6x8, White); //za mało miejsca na ekranie -> (???)
+//		}
+//	}
 
 
 	ssd1306_SetCursor(0, 16);
-	ssd1306_WriteString("WRITE buff", Font_7x10, entrySelected(0) ? Black : White);
-	extern CircularBuffer cb;
-	if(entrySelected(0) && entryClicked(0)) {
-
-
-		//CircularBuffer_Add(&cb, str);
-//		sd_writefile("test;test;123;123.4;0.0 ");
-//		sd_closefile();
-	}
-	//ssd1306_WriteString(rtcTimeStr, Font_7x10, White);
+	ssd1306_WriteString("START", Font_7x10, entrySelected(0) ? Black : White);
 	ssd1306_SetCursor(0, 26);
-	ssd1306_WriteString("adc/READ buff", Font_7x10, entrySelected(1) ? Black : White);
+	ssd1306_WriteString("STOP", Font_7x10, entrySelected(1) ? Black : White);
+
+
+	if(entrySelected(0) && entryClicked(0)) {
+		debug=true;
+		measureStatusStr="                ";
+		measureStatusStr="Measure started";
+	}
 	if(entrySelected(1) && entryClicked(1)) {
-//		volatile const char *dataFromBuff = CircularBuffer_Read(&cb);
-//		if(dataFromBuff==NULL) {
-//			send_uart("Bufor jest pusty\n\r");
-//		}
-//		else {
-//			send_uart(dataFromBuff);
-//		}
-		getValAdc();
+		debug=false;
+		sd_closefile();
+		sd_demount();
+		measureStatusStr="                ";
+		measureStatusStr="Measure stopped";
+	}
+	ssd1306_SetCursor(0, 36);
+	ssd1306_WriteString(measureStatusStr, Font_6x8, White);
+	//ssd1306_WriteString(rtcTimeStr, Font_7x10, White);
+//	ssd1306_SetCursor(0, 26);
+//	ssd1306_WriteString("adc/READ buff", Font_7x10, entrySelected(1) ? Black : White);
+//	if(entrySelected(1) && entryClicked(1)) {
+////		volatile const char *dataFromBuff = CircularBuffer_Read(&cb);
+////		if(dataFromBuff==NULL) {
+////			send_uart("Bufor jest pusty\n\r");
+////		}
+////		else {
+////			send_uart(dataFromBuff);
+////		}
+//		getValAdc();
 //		sd_readfile();
 //		sd_closefile();
-	}
+	//}
 	//ssd1306_WriteString(rtcDateStr, Font_7x10, White);
 
 	backButton(2, MAIN_MENU, 2);
@@ -438,7 +450,7 @@ Menu menu[] = {
 	[SENSOR_CONFIG_DS18_2] = {drawSensorConfigGeneric,0,{}},
 	[SENSOR_CONFIG_DS18_3] = {drawSensorConfigGeneric,0,{}},
 	[SD_CONFIG] = {drawSdConfig, 0, {}},
-	[ONOFF_MEASURE] = {testAllSensors, 0, {}},
+	[ONOFF_MEASURE] = {drawOnoffMeasure, 0, {}},
 	[DEBUG_ADC_INT] = {debugAdcInt, 0, {}},
 	[DEBUG_ADC_EXT] = {debugAdcExt, 0, {}}
 };
