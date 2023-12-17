@@ -24,12 +24,23 @@ FATFS *pfs;
 DWORD fre_clust;
 uint32_t total, free_space;
 
+bool generalErrorLED = false;
 char buffer[128];
 bool sdReady = false;
 // functions
+
+void setErrorLED(bool isSet) {
+	if(isSet) {
+		HAL_GPIO_WritePin(LED5_GPIO_Port, LED5_Pin, GPIO_PIN_SET);
+	}
+	else {
+		HAL_GPIO_WritePin(LED5_GPIO_Port, LED5_Pin, GPIO_PIN_RESET);
+	}
+}
+
 void sd_demount() {
-	f_mount(NULL, "", 0);
-	send_uart("<drive unmounted>");
+	fresult = f_mount(NULL, "", 0);
+	send_uart("<drive unmounted>\n\r");
 }
 
 void sd_init() {
@@ -37,11 +48,12 @@ void sd_init() {
 
 	if(fresult==FR_OK) {
 		sdReady = true;
-		send_uart("sd status: FR_OK\n\r");
+		send_uart("\rsd status: FR_OK\n\r");
 	}
 	else {
 		sdReady = false;
-		send_uart("sd status: SD ERR\n\r");
+		send_uart("\rsd status: SD ERR\n\r");
+		setErrorLED(true);
 	}
 }
 
@@ -78,32 +90,62 @@ void sd_readfile() {
 			send_uart("\n\r");
 		}
 		else {
-			send_uart("<error  opening file>\n\r");
+			send_uart("<sd_readfile: error  opening file>\n\r");
 		}
 	}
 }
 volatile BYTE SD_SAVEMODE;
-
-void sd_writefile(char sdWriteBuff[500]) {
-	if(dataOverwrite) { //to nie dziala poprawnie, przy kazdym zapisie czysci kartę
-		SD_SAVEMODE = FA_CREATE_ALWAYS | FA_READ | FA_WRITE;
-	}
-	else {
-		SD_SAVEMODE = FA_OPEN_APPEND | FA_READ | FA_WRITE;
-	}
+static unsigned int file_number = 1;
+FRESULT sd_openfile() {
+	char filename[12];
 	if(sdReady) {
-		fresult = f_open(&fil, "file1.txt", SD_SAVEMODE);
-		f_puts(sdWriteBuff, &fil);
-		f_sync(&fil);
-		sd_closefile();
-		send_uart("<file written>\n\r");
+		sprintf(filename, "%03u.txt", file_number);
+		fresult = f_open(&fil, filename, FA_OPEN_APPEND | FA_READ | FA_WRITE);
+
+		if(fresult!=FR_OK) {
+			sdReady=false;
+			send_uart("\r<cannot open file! sd_openfile>\n\r");
+			setErrorLED(true);
+		}
+		else {
+			file_number++;
+			send_uart("<file opened>\n\r");
+			//sd_writeline("timestamp,adc_ext_ch0,adc_ext_ch1,adc_ext_ch2,adc_ext_ch3,adc_int_ch0,adc_int_ch1,adc_int_ch2,adc_int_ch3,ds18b20_1,ds18b20_2,ds18b20_3\n");
+		}
+		return fresult;
 	}
+	else {send_uart("<sdReady returned false! sd_openfile>"); return fresult; setErrorLED(true);}
+	return FR_DISK_ERR;
 }
+static unsigned int line_count = 0;
+FRESULT sd_writeline(const char* sdWriteBuff) {
+	if(sdReady) {
+			//f_puts(sdWriteBuff, &fil);
+			if(f_puts(sdWriteBuff, &fil)<0) {
+				return FR_DISK_ERR;
+				send_uart("f_puts error <0 \n\r");
+				setErrorLED(true);
+			}
+			line_count++;
+			if(line_count>=10) {
+				line_count=0;
+				sd_closefile();
+				sd_openfile();
+			}
+
+			f_sync(&fil);
+			send_uart("\r<line written>\n\r");
+			return FR_OK;
+		}
+	else {send_uart("<sd_writeline: cannot write line>");setErrorLED(true);}
+	return FR_DISK_ERR;
+}
+
 
 void sd_closefile() {
 	if(sdReady) {
 		fresult = f_close(&fil);
-		send_uart("<closing file>\n\r");
+		send_uart("\r<file closed>\n\r");
 	}
 }
 

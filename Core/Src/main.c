@@ -299,6 +299,7 @@ int main(void)
 			  needToWrite=true;
 		  }
 		  if(needToWrite) {
+
 			  char* dateTimeStr = getRtcString();
 			  char finalResults[2048] = "";
 			  char temp[100];
@@ -327,9 +328,14 @@ int main(void)
 
 			      dataFromBuff = CircularBuffer_Read(&cb);
 				  send_uart(dataFromBuff);
-				  sd_writefile(dataFromBuff);
+				  sd_writeline(dataFromBuff);
+
 			      //send_uart(finalResults);
 		  }
+		  HAL_GPIO_WritePin(LED5_GPIO_Port, LED5_Pin, GPIO_PIN_SET);
+	  }
+	  else {
+		  HAL_GPIO_WritePin(LED5_GPIO_Port, LED5_Pin, GPIO_PIN_RESET);
 	  }
 	displayMenu();
   }
@@ -863,7 +869,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : DET_SD_Pin */
   GPIO_InitStruct.Pin = DET_SD_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(DET_SD_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LED2_Pin LED1_Pin LED4_Pin LED3_Pin */
