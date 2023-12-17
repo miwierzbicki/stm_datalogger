@@ -4,7 +4,7 @@
 ../Core/Src/menu.c:41:6:listAllItemsFromMenu	3
 ../Core/Src/menu.c:52:6:drawMainMenu	1
 ../Core/Src/menu.c:65:6:drawSensorConfig	1
-../Core/Src/menu.c:76:6:drawSdConfig	8
+../Core/Src/menu.c:76:6:drawSdConfig	5
 ../Core/Src/menu.c:127:6:drawSensorConfigAdcExt	1
 ../Core/Src/menu.c:132:6:drawSensorConfigAdcInt	1
 ../Core/Src/menu.c:137:6:drawSensorConfigDS18	1
@@ -17,5 +17,5 @@
 ../Core/Src/menu.c:290:6:debugAdcInt	1
 ../Core/Src/menu.c:312:6:debugAdcExt	1
 ../Core/Src/menu.c:330:6:testAllSensors	2
-../Core/Src/menu.c:341:6:drawOnoffMeasure	9
-../Core/Src/menu.c:501:6:displayMenu	1
+../Core/Src/menu.c:341:6:drawOnoffMeasure	10
+../Core/Src/menu.c:499:6:displayMenu	1

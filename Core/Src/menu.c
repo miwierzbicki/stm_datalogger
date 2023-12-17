@@ -88,17 +88,17 @@ void drawSdConfig(Menu *menu) {
 
 	}
 	else {
-		ssd1306_WriteString(" OK", Font_7x10, White);
+		ssd1306_WriteString(getFresultString(fresult), Font_7x10, White);
 		ssd1306_SetCursor(0, 10);
 		ssd1306_WriteString("Overwrite: ", Font_7x10, entrySelected(0) ? Black : White);
-		if(entrySelected(0) && entryClicked(0)) {
-					if(dataOverwrite==false) {
-						dataOverwrite=true;
-					}
-					else {
-						dataOverwrite=false;
-					}
-		}
+//		if(entrySelected(0) && entryClicked(0)) {
+//					if(dataOverwrite==false) {
+//						dataOverwrite=true;
+//					}
+//					else {
+//						dataOverwrite=false;
+//					}
+//		}
 		ssd1306_SetCursor(75, 10);
 		sprintf(strDataOverwrite, "%s", dataOverwrite ? "true" : "false");
 		ssd1306_WriteString(strDataOverwrite, Font_7x10, entrySelected(0) ? Black : White);
@@ -360,7 +360,7 @@ void drawOnoffMeasure(Menu *menu) {
 	else {
 		ssd1306_SetCursor(0, 0);
 		currPos=-8;
-		char sensorDetailsStr[30];
+		//char sensorDetailsStr[30];
 		encSetRange(0,2);
 
 		ssd1306_SetCursor(0, 16);
@@ -375,12 +375,13 @@ void drawOnoffMeasure(Menu *menu) {
 				measureStatusStr="Already started!";
 			}
 			else {
-				sd_openfile();
-				if(sd_writeline("<NEW_MEASURE_BEGIN>\n")==FR_OK) {
-
-					debug=true;
-					measureStatusStr="                ";
-					measureStatusStr="Measure started";
+				if(sd_openfile()==FR_OK) {
+					if(sd_writeline("<NEW_MEASURE_BEGIN>\n")==FR_OK) {
+						sd_writeline("timestamp,adc_ext_ch0,adc_ext_ch1,adc_ext_ch2,adc_ext_ch3,adc_int_ch0,adc_int_ch1,adc_int_ch2,adc_int_ch3,ds18b20_1,ds18b20_2,ds18b20_3\n");
+						debug=true;
+						measureStatusStr="                ";
+						measureStatusStr="Measure started";
+					}
 				}
 				else {
 					measureStatusStr="                ";
@@ -388,14 +389,11 @@ void drawOnoffMeasure(Menu *menu) {
 					restartDetSdString="Restart needed";
 				}
 			}
-
-
-
 		}
 		if(entrySelected(1) && entryClicked(1)) {
 			debug=false;
 			sd_closefile();
-			sd_demount();
+			//sd_demount();
 			measureStatusStr="                ";
 			measureStatusStr="Measure stopped";
 		}

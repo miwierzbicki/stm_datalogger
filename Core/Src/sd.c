@@ -105,6 +105,7 @@ FRESULT sd_openfile() {
 		if(fresult!=FR_OK) {
 			sdReady=false;
 			send_uart("\r<cannot open file! sd_openfile>\n\r");
+
 			setErrorLED(true);
 		}
 		else {
@@ -127,10 +128,11 @@ FRESULT sd_writeline(const char* sdWriteBuff) {
 				setErrorLED(true);
 			}
 			line_count++;
-			if(line_count>=10) {
+			if(line_count>=100) {
 				line_count=0;
 				sd_closefile();
 				sd_openfile();
+				sd_writeline("timestamp,adc_ext_ch0,adc_ext_ch1,adc_ext_ch2,adc_ext_ch3,adc_int_ch0,adc_int_ch1,adc_int_ch2,adc_int_ch3,ds18b20_1,ds18b20_2,ds18b20_3\n");
 			}
 
 			f_sync(&fil);

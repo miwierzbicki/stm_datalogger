@@ -65,6 +65,11 @@ extern RTC_TimeTypeDef time;
 extern RTC_DateTypeDef date;
 char* getRtcString(void);
 extern bool debug;
+typedef struct {
+	GPIO_TypeDef* port;
+	uint16_t pin;
+	bool state;
+}LED;
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

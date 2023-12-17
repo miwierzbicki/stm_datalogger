@@ -194,6 +194,16 @@ char* getRtcString(void)  {
 	return dateTime;
 }
 
+LED leds[] = {
+		{GPIOB, GPIO_PIN_13, false},
+		{GPIOB, GPIO_PIN_12, false},
+		{GPIOB, GPIO_PIN_4, false},
+		{GPIOB, GPIO_PIN_3, false},
+		{GPIOA, GPIO_PIN_15, false}
+};
+
+
+
 bool debug;
 volatile const char *dataFromBuff;
 
@@ -242,13 +252,17 @@ int main(void)
   encoderInit(&htim1);
 
   ds18_init(&htim10);
+
+
+
+
   adc_int_init(&hadc1);
   adc_ext_init(&hi2c2);
   huart_ds_init(&huart6);
   sendRtcHandler(&hrtc);
   HAL_TIM_Base_Start(&htim10);
   displayInit();
-  wire_reset();
+  //wire_reset();
 
   CircularBuffer_Init(&cb);
   sd_init();
@@ -338,6 +352,14 @@ int main(void)
 		  HAL_GPIO_WritePin(LED5_GPIO_Port, LED5_Pin, GPIO_PIN_RESET);
 	  }
 	displayMenu();
+	for(int i=0; i<sizeof(leds)/sizeof(leds[0]); i++) {
+		if(leds[i].state) {
+			HAL_GPIO_WritePin(leds[i].port, leds[i].pin, GPIO_PIN_SET);
+		}
+		else {
+			HAL_GPIO_WritePin(leds[i].port, leds[i].pin, GPIO_PIN_RESET);
+		}
+	}
   }
   /* USER CODE END 3 */
 }

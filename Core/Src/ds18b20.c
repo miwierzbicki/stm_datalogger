@@ -12,19 +12,30 @@
 
 TIM_HandleTypeDef *htim10_new;
 
+const uint8_t ds1addr[] = {0x28, 0x0, 0x2f, 0xfd, 0x5, 0x0, 0x0, 0x50};
+const uint8_t ds2addr[] = {0x28, 0xc3, 0xa5, 0xfd, 0x5, 0x0, 0x0, 0xe0};
+const uint8_t ds3addr[];
+
 
 float getValueDs1(void) {
-	wire_reset();
-		wire_write(0xcc);
-		wire_write(0x44);
+		oneWireReset();
+		oneWireWrite(0x55);
+
+		for(int i=0; i<8; i++) {
+			oneWireWrite(ds1addr[i]);
+		}
+		oneWireWrite(0x44);
 		HAL_Delay(95);
-		wire_reset();
-		wire_write(0xcc);
-		wire_write(0xbe);
+		oneWireReset();
+		oneWireWrite(0x55);
+		for(int i=0; i<8; i++) {
+			oneWireWrite(ds1addr[i]);
+		}
+		oneWireWrite(0xbe);
 		int i;
 		uint8_t rom_code[9];
 		for (i = 0; i < 9; i++)
-		  rom_code[i] = wire_read();
+		  rom_code[i] = oneWireRead();
 		float temp= ((rom_code[1]<<8) | (rom_code[0]));
 
 		//send_uart_float(temp);
@@ -32,40 +43,33 @@ float getValueDs1(void) {
 }
 
 float getValueDs2(void) {
-	wire_reset();
-		wire_write(0xcc);
-		wire_write(0x44);
-		HAL_Delay(95);
-		wire_reset();
-		wire_write(0xcc);
-		wire_write(0xbe);
-		int i;
-		uint8_t rom_code[9];
-		for (i = 0; i < 9; i++)
-		  rom_code[i] = wire_read();
-		float temp= ((rom_code[1]<<8) | (rom_code[0]));
+	oneWireReset();
+	oneWireWrite(0x55);
 
+	for(int i=0; i<8; i++) {
+		oneWireWrite(ds2addr[i]);
+	}
+	oneWireWrite(0x44);
+	HAL_Delay(95);
+	oneWireReset();
+	oneWireWrite(0x55);
+	for(int i=0; i<8; i++) {
+		oneWireWrite(ds2addr[i]);
+	}
+	oneWireWrite(0xbe);
+	int i;
+	uint8_t rom_code[9];
+	for (i = 0; i < 9; i++)
+	  rom_code[i] = oneWireRead();
+	float temp= ((rom_code[1]<<8) | (rom_code[0]));
 
-		return temp = temp/16.0f;
+	//send_uart_float(temp);
+	return temp = temp/16.0f;
 
 }
 
 float getValueDs3(void) {
-	wire_reset();
-		wire_write(0xcc);
-		wire_write(0x44);
-		HAL_Delay(95);
-		wire_reset();
-		wire_write(0xcc);
-		wire_write(0xbe);
-		int i;
-		uint8_t rom_code[9];
-		for (i = 0; i < 9; i++)
-		  rom_code[i] = wire_read();
-		float temp= ((rom_code[1]<<8) | (rom_code[0]));
-
-
-		return temp = temp/16.0f;
+	return 0.0;
 }
 
 
@@ -80,7 +84,7 @@ void delay_us(uint32_t us)
 	  while (__HAL_TIM_GET_COUNTER(htim10_new) < us) {}
 }
 
-HAL_StatusTypeDef wire_reset(void)
+HAL_StatusTypeDef oneWireReset(void)
 {
   int rc;
 
@@ -97,7 +101,7 @@ HAL_StatusTypeDef wire_reset(void)
     return HAL_ERROR;
 }
 
-void write_bit(int value)
+void bitWrite(int value)
 {
   if (value) {
     HAL_GPIO_WritePin(DSO_DATA_GPIO_Port, DSO_DATA_Pin, GPIO_PIN_RESET);
@@ -113,7 +117,7 @@ void write_bit(int value)
 }
 
 
-int read_bit(void)
+int bitRead(void)
 {
   int rc;
   HAL_GPIO_WritePin(DSO_DATA_GPIO_Port, DSO_DATA_Pin, GPIO_PIN_RESET);
@@ -125,22 +129,22 @@ int read_bit(void)
   return rc;
 }
 
-void wire_write(uint8_t byte)
+void oneWireWrite(uint8_t byte)
 {
   int i;
   for (i = 0; i < 8; i++) {
-    write_bit(byte & 0x01);
+    bitWrite(byte & 0x01);
     byte >>= 1;
   }
 }
 
-uint8_t wire_read(void)
+uint8_t oneWireRead(void)
 {
   uint8_t value = 0;
   int i;
   for (i = 0; i < 8; i++) {
     value >>= 1;
-    if (read_bit())
+    if (bitRead())
       value |= 0x80;
   }
   return value;
