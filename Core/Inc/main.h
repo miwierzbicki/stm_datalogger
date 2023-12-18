@@ -70,6 +70,8 @@ typedef struct {
 	uint16_t pin;
 	bool state;
 }LED;
+
+extern LED leds[];
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

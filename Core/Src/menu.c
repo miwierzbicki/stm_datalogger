@@ -85,6 +85,7 @@ void drawSdConfig(Menu *menu) {
 		ssd1306_WriteString(getFresultString(fresult), Font_7x10, White);
 		ssd1306_SetCursor(0, 20);
 		ssd1306_WriteString("Start forbidden", Font_7x10, White);
+		leds[2].state=true;
 
 	}
 	else {
@@ -112,6 +113,7 @@ void drawSdConfig(Menu *menu) {
 			unmountString="Unmount SD success";
 			restartAlertString="                  ";
 			restartAlertString="RESTART NEEDED!";
+			leds[2].state=true;
 		}
 		ssd1306_SetCursor(0,30);
 		ssd1306_WriteString(unmountString, Font_7x10, White);
@@ -346,6 +348,9 @@ void drawOnoffMeasure(Menu *menu) {
 		ssd1306_WriteString("SD ERROR!", Font_11x18, White);
 		ssd1306_SetCursor(0, 18);
 		ssd1306_WriteString(getFresultString(fresult), Font_7x10, White);
+		ssd1306_SetCursor(0, 28);
+		ssd1306_WriteString("RESTART NEEDED!", Font_7x10, White);
+		leds[2].state=true;
 		currPos=0;
 	}
 	else if(sdUnmounted) {
@@ -355,18 +360,19 @@ void drawOnoffMeasure(Menu *menu) {
 		ssd1306_WriteString("NEEDED", Font_11x18, White);
 		ssd1306_SetCursor(0, 36);
 		ssd1306_WriteString("after unmounting SD!", Font_6x8, White);
-
+		leds[2].state=true;
 	}
 	else {
+		leds[2].state=false;
 		ssd1306_SetCursor(0, 0);
 		currPos=-8;
 		//char sensorDetailsStr[30];
 		encSetRange(0,2);
 
-		ssd1306_SetCursor(0, 16);
-		ssd1306_WriteString("START", Font_7x10, entrySelected(0) ? Black : White);
-		ssd1306_SetCursor(0, 26);
-		ssd1306_WriteString("STOP", Font_7x10, entrySelected(1) ? Black : White);
+		ssd1306_SetCursor(0, 0);
+		ssd1306_WriteString("START", Font_11x18, entrySelected(0) ? Black : White);
+		ssd1306_SetCursor(0, 18);
+		ssd1306_WriteString("STOP", Font_11x18, entrySelected(1) ? Black : White);
 
 
 		if(entrySelected(0) && entryClicked(0)) {
@@ -387,6 +393,7 @@ void drawOnoffMeasure(Menu *menu) {
 					measureStatusStr="                ";
 					measureStatusStr="SD not detected!";
 					restartDetSdString="Restart needed";
+					leds[2].state=true;
 				}
 			}
 		}

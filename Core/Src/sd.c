@@ -29,14 +29,7 @@ char buffer[128];
 bool sdReady = false;
 // functions
 
-void setErrorLED(bool isSet) {
-	if(isSet) {
-		HAL_GPIO_WritePin(LED5_GPIO_Port, LED5_Pin, GPIO_PIN_SET);
-	}
-	else {
-		HAL_GPIO_WritePin(LED5_GPIO_Port, LED5_Pin, GPIO_PIN_RESET);
-	}
-}
+
 
 void sd_demount() {
 	fresult = f_mount(NULL, "", 0);
@@ -53,7 +46,7 @@ void sd_init() {
 	else {
 		sdReady = false;
 		send_uart("\rsd status: SD ERR\n\r");
-		setErrorLED(true);
+		leds[1].state=true;
 	}
 }
 
@@ -106,7 +99,7 @@ FRESULT sd_openfile() {
 			sdReady=false;
 			send_uart("\r<cannot open file! sd_openfile>\n\r");
 
-			setErrorLED(true);
+			leds[1].state=true;
 		}
 		else {
 			file_number++;
@@ -115,7 +108,7 @@ FRESULT sd_openfile() {
 		}
 		return fresult;
 	}
-	else {send_uart("<sdReady returned false! sd_openfile>"); return fresult; setErrorLED(true);}
+	else {send_uart("<sdReady returned false! sd_openfile>"); return fresult; leds[1].state=true;}
 	return FR_DISK_ERR;
 }
 static unsigned int line_count = 0;
@@ -125,7 +118,7 @@ FRESULT sd_writeline(const char* sdWriteBuff) {
 			if(f_puts(sdWriteBuff, &fil)<0) {
 				return FR_DISK_ERR;
 				send_uart("f_puts error <0 \n\r");
-				setErrorLED(true);
+				leds[1].state=true;
 			}
 			line_count++;
 			if(line_count>=100) {
@@ -139,7 +132,7 @@ FRESULT sd_writeline(const char* sdWriteBuff) {
 			send_uart("\r<line written>\n\r");
 			return FR_OK;
 		}
-	else {send_uart("<sd_writeline: cannot write line>");setErrorLED(true);}
+	else {send_uart("<sd_writeline: cannot write line>");leds[1].state=true;}
 	return FR_DISK_ERR;
 }
 

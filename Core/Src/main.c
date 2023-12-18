@@ -195,11 +195,11 @@ char* getRtcString(void)  {
 }
 
 LED leds[] = {
-		{GPIOB, GPIO_PIN_13, false},
+		{GPIOB, GPIO_PIN_13, false}, //LED1
 		{GPIOB, GPIO_PIN_12, false},
 		{GPIOB, GPIO_PIN_4, false},
 		{GPIOB, GPIO_PIN_3, false},
-		{GPIOA, GPIO_PIN_15, false}
+		{GPIOA, GPIO_PIN_15, false} //LED5
 };
 
 
@@ -346,10 +346,10 @@ int main(void)
 
 			      //send_uart(finalResults);
 		  }
-		  HAL_GPIO_WritePin(LED5_GPIO_Port, LED5_Pin, GPIO_PIN_SET);
+		  leds[4].state=true;
 	  }
 	  else {
-		  HAL_GPIO_WritePin(LED5_GPIO_Port, LED5_Pin, GPIO_PIN_RESET);
+		  leds[4].state=false;
 	  }
 	displayMenu();
 	for(int i=0; i<sizeof(leds)/sizeof(leds[0]); i++) {
