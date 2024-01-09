@@ -94,7 +94,7 @@ static void MX_RTC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-int8_t sendToUart=0; //to nie jest wysłanie na uart! nazwa tymczasowa
+int8_t encClicked=0;
 int8_t ch1przerwanie=0;
 int8_t ch2przerwanie=0;
 int8_t ch3przerwanie=0;
@@ -110,8 +110,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if(htim->Instance == TIM11) {
 		HAL_TIM_Base_Stop_IT(htim);
 		if(HAL_GPIO_ReadPin(ENC_BTN_GPIO_Port, ENC_BTN_Pin)==GPIO_PIN_RESET) {
-			sendToUart=1;
-
+			encClicked=1;
 			}
 		}
 	}
@@ -121,29 +120,25 @@ void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim) {
   if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1) {
     pulse = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
     ch1przerwanie=1;
-    /* Set the Capture Compare Register value */
-      __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, (pulse + 999)); //to wartosc pulse dla kazdego timera
+      __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, (pulse + 50000));
   }
 
   if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2) {
-  pulse = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
-  ch2przerwanie=1;
-  /* Set the Capture Compare Register value */ //z github https://github.com/cnoviello/mastering-stm32-2nd/blame/2183a2c5fe25fd9229abd21dab4f23658036dd3f/Nucleo-L476RG/CH11/Core/Src/main-ex7.c#L61
-    __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_2, (pulse + 9318));
-  }
+	pulse = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
+	ch2przerwanie=1;
+	__HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_2, (pulse + 100000));
+  	  }
 
   if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3) {
     pulse = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
     ch3przerwanie=1;
-    /* Set the Capture Compare Register value */ //z github https://github.com/cnoviello/mastering-stm32-2nd/blame/2183a2c5fe25fd9229abd21dab4f23658036dd3f/Nucleo-L476RG/CH11/Core/Src/main-ex7.c#L61
-      __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_3, (pulse + 36000));
+    __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_3, (pulse + 200000));
     }
 
   if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_4) {
     pulse = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_4);
     ch4przerwanie=1;
-    /* Set the Capture Compare Register value */ //z github https://github.com/cnoviello/mastering-stm32-2nd/blame/2183a2c5fe25fd9229abd21dab4f23658036dd3f/Nucleo-L476RG/CH11/Core/Src/main-ex7.c#L61
-      __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_4, (pulse + 67000));
+    __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_4, (pulse + 400000));
     }
 }
 
@@ -159,8 +154,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 
 
 bool isClicked(void) {
-	if(sendToUart==1) {
-		sendToUart=0;
+	if(encClicked==1) {
+		encClicked=0;
 		return true;
 	}
 	else {
@@ -199,7 +194,7 @@ LED leds[] = {
 		{GPIOB, GPIO_PIN_12, false},
 		{GPIOB, GPIO_PIN_4, false},
 		{GPIOB, GPIO_PIN_3, false},
-		{GPIOA, GPIO_PIN_15, false} //LED5
+		{GPIOA, GPIO_PIN_15, false}
 };
 
 
@@ -253,24 +248,17 @@ int main(void)
 
   ds18_init(&htim10);
 
-
-
-
   adc_int_init(&hadc1);
   adc_ext_init(&hi2c2);
   huart_ds_init(&huart6);
   sendRtcHandler(&hrtc);
   HAL_TIM_Base_Start(&htim10);
   displayInit();
-  //wire_reset();
+
 
   CircularBuffer_Init(&cb);
   sd_init();
-  send_uart("total: ");
-  send_uart_uint32(sd_totalspace());
-  send_uart("\n\rfree: ");
-  send_uart_uint32(sd_freespace());
-  send_uart("\n\r");
+
 
   debug=false;
 
@@ -328,23 +316,19 @@ int main(void)
 					  snprintf(temp, sizeof(temp), "");
 				  }
 				  strncat(finalResults, temp, sizeof(finalResults) - strlen(finalResults) - 1);
-
-				  // Dodaj przecinek, chyba że to ostatni element
 				  if (i < 10) {
 					  strncat(finalResults, ",", sizeof(finalResults) - strlen(finalResults) - 1);
 				  }
-				  sensors[i].hasValue = false; // Resetowanie flagi
+				  sensors[i].hasValue = false;
 			  }
 			      strncat(finalResults, "\n", sizeof(finalResults) - strlen(finalResults) - 1);
 			      if(!allNulls) {
 			    	  CircularBuffer_Add(&cb, finalResults);
 			      }
-
 			      dataFromBuff = CircularBuffer_Read(&cb);
 				  send_uart(dataFromBuff);
 				  sd_writeline(dataFromBuff);
 
-			      //send_uart(finalResults);
 		  }
 		  leds[4].state=true;
 	  }
@@ -702,7 +686,7 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 12000;
+  htim2.Init.Prescaler = 999;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 4294967295;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -727,24 +711,24 @@ static void MX_TIM2_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_TOGGLE;
-  sConfigOC.Pulse = 6659;
+  sConfigOC.Pulse = 50000;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_OC_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
   {
     Error_Handler();
   }
-  sConfigOC.Pulse = 13500;
+  sConfigOC.Pulse = 100000;
   if (HAL_TIM_OC_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
   {
     Error_Handler();
   }
-  sConfigOC.Pulse = 36000;
+  sConfigOC.Pulse = 200000;
   if (HAL_TIM_OC_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
   {
     Error_Handler();
   }
-  sConfigOC.Pulse = 67000;
+  sConfigOC.Pulse = 400000;
   if (HAL_TIM_OC_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
   {
     Error_Handler();

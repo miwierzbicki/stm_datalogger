@@ -14,21 +14,14 @@
 #include "fatfs.h"
 
 //do obslugi fatfs
-FATFS fs;  // file system
-FIL fil; // File
-FILINFO fno;
-volatile FRESULT fresult;  // result
-UINT br, bw;  // File read/write count
-
-FATFS *pfs;
-DWORD fre_clust;
-uint32_t total, free_space;
+FATFS fs;
+FIL fil;
+volatile FRESULT fresult;
+UINT br, bw;
 
 bool generalErrorLED = false;
 char buffer[128];
 bool sdReady = false;
-// functions
-
 
 
 void sd_demount() {
@@ -41,43 +34,24 @@ void sd_init() {
 
 	if(fresult==FR_OK) {
 		sdReady = true;
-		send_uart("\rsd status: FR_OK\n\r");
+		send_uart("SD status: FR_OK\n\r");
+		send_uart("<DEVICE READY>\n\r");
 	}
 	else {
 		sdReady = false;
-		send_uart("\rsd status: SD ERR\n\r");
+		send_uart("sd status: SD ERR\n\r");
+		send_uart("<DEVICE ERROR>\n\r");
 		leds[1].state=true;
 	}
 }
 
-uint32_t sd_freespace() {
-	if(sdReady) {
-		f_getfree("", &fre_clust, &pfs);
-		return free_space = (uint32_t)(fre_clust * pfs->csize * 0.5);
-	}
-	else {
-		return 0;
-	}
-
-}
-
-uint32_t sd_totalspace() {
-	if(sdReady) {
-		f_getfree("", &fre_clust, &pfs);
-		return total = (uint32_t)((pfs->n_fatent - 2) * pfs->csize * 0.5);
-	}
-	else {
-		return 0;
-	}
-
-}
 
 void sd_readfile() {
 	if(sdReady) {
-	fresult = f_open(&fil, "file1.txt", FA_READ); //tu odczyt
+	fresult = f_open(&fil, "file1.txt", FA_READ);
 		if(fresult==FR_OK) {
 			send_uart("<data>: ");
-			memset(buffer, 0, sizeof(buffer)); //czyszczenie bufora
+			memset(buffer, 0, sizeof(buffer));
 			f_read(&fil, buffer, f_size(&fil), &br);
 			send_uart(buffer);
 			send_uart("\n\r");
@@ -137,7 +111,7 @@ FRESULT sd_writeline(const char* sdWriteBuff) {
 }
 
 
-void sd_closefile() {
+void sd_closefile(void) {
 	if(sdReady) {
 		fresult = f_close(&fil);
 		send_uart("\r<file closed>\n\r");

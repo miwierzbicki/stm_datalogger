@@ -22,8 +22,8 @@ void adc_ext_init(I2C_HandleTypeDef *hi2c2) {
 }
 
 
-void adc_select_ch(uint32_t channel) { //trzeba wywolywac za kazdym razem przed konwersją adc bo inaczej będzie tylko ch0!!!!!!!!
-	//wartości channel = ADC_CHANNEL_0, 1, 2, 3
+void adc_select_ch(uint32_t channel) { //trzeba wywolywac za kazdym razem przed konwersją adc bo inaczej będzie tylko ch0!
+	//wartości channel -> ADC_CHANNEL_0, 1, 2, 3
 	ADC_ChannelConfTypeDef sConfig = {0};
 	sConfig.Channel = channel;
 	sConfig.Rank = 1;
@@ -34,130 +34,75 @@ void adc_select_ch(uint32_t channel) { //trzeba wywolywac za kazdym razem przed 
 	}
 }
 
-void getValAdc(void) {
-	uint32_t value;
-	adc_select_ch(ADC_CHANNEL_1);
-	HAL_ADC_Start(hadc1_new);
-	HAL_ADC_PollForConversion(hadc1_new, HAL_MAX_DELAY);
-	value = HAL_ADC_GetValue(hadc1_new);
-	float voltage = 3.3f * value / 4096.0f;
-	char adcStr[200];
-	sprintf(adcStr, "a0=%lu (%.3f V)\n\r", value, voltage);
-	//send_uart(adcStr);
-
-	adc_select_ch(ADC_CHANNEL_3);
-    HAL_ADC_Start(hadc1_new);
-    HAL_ADC_PollForConversion(hadc1_new, HAL_MAX_DELAY);
-    value = HAL_ADC_GetValue(hadc1_new);
-    voltage = 3.3f * value / 4096.0f;
-    sprintf(adcStr, "a3=%lu (%.3f V)\n\r", value, voltage);
-    //send_uart(adcStr);
-}
-
-
 
 float getValueAdcExtCh0(void) {
-	#define ADS1115_ADDRESS 0x48
-	unsigned char ADSwrite[6];
-	int16_t reading;
-	volatile float voltage;
-	const float voltageConv = 6.114 / 32768.0;
-	ADSwrite[0] = 0x01;
-	ADSwrite[1] = 0xC1; //11000001
-	ADSwrite[2] = 0x83; //10000011 LSB
-
-	HAL_I2C_Master_Transmit(hi2c2_new, ADS1115_ADDRESS << 1, ADSwrite, 3, 100);
-	ADSwrite[0] = 0x00;
-	HAL_I2C_Master_Transmit(hi2c2_new, ADS1115_ADDRESS << 1 , ADSwrite, 1 ,100);
-	HAL_Delay(20);
-
-	HAL_I2C_Master_Receive(hi2c2_new, ADS1115_ADDRESS <<1, ADSwrite, 2, 100);
-	reading = (ADSwrite[0] << 8 | ADSwrite[1] );
-	if(reading < 0) {
-		reading = 0;
+	unsigned char dataPacket[6];
+	int16_t valueFromRegister;
+	dataPacket[0] = 0x01;
+	dataPacket[1] = 0xC3;
+	dataPacket[2] = 0x83;
+	HAL_I2C_Master_Transmit(hi2c2_new, 0x48 << 1, dataPacket, 3, HAL_MAX_DELAY);
+	dataPacket[0] = 0x00;
+	HAL_I2C_Master_Transmit(hi2c2_new, 0x48 << 1, dataPacket, 1 ,HAL_MAX_DELAY);
+	HAL_Delay(10);
+	HAL_I2C_Master_Receive(hi2c2_new, 0x48 << 1, dataPacket, 2, HAL_MAX_DELAY);
+	valueFromRegister = (dataPacket[0] << 8 | dataPacket[1] );
+	return valueFromRegister * (4.096/32768.0); //zakres pomiarowy/2^15 (bo 2x8 bitów)
 	}
-	return voltage = reading * voltageConv;
-//	char str[20];
-//	sprintf(str, "ext_ch0=%.3f V\n\r", voltage);
-//	send_uart(str);
 
-}
 float getValueAdcExtCh1(void) {
-#define ADS1115_ADDRESS 0x48
-	unsigned char ADSwrite[6];
-	int16_t reading;
-	volatile float voltage;
-	const float voltageConv = 6.114 / 32768.0;
-	ADSwrite[0] = 0x01;
-	ADSwrite[1] =  0xD1; //11000001
-	ADSwrite[2] = 0x83; //10000011 LSB
-
-	HAL_I2C_Master_Transmit(hi2c2_new, ADS1115_ADDRESS << 1, ADSwrite, 3, 100);
-	ADSwrite[0] = 0x00;
-	HAL_I2C_Master_Transmit(hi2c2_new, ADS1115_ADDRESS << 1 , ADSwrite, 1 ,100);
-	HAL_Delay(20);
-
-	HAL_I2C_Master_Receive(hi2c2_new, ADS1115_ADDRESS <<1, ADSwrite, 2, 100);
-	reading = (ADSwrite[0] << 8 | ADSwrite[1] );
-	if(reading < 0) {
-		reading = 0;
-	}
-	return voltage = reading * voltageConv;
+	unsigned char dataPacket[6];
+	int16_t valueFromRegister;
+	dataPacket[0] = 0x01;
+	dataPacket[1] = 0xD3;
+	dataPacket[2] = 0x83;
+	HAL_I2C_Master_Transmit(hi2c2_new, 0x48 << 1, dataPacket, 3, HAL_MAX_DELAY);
+	dataPacket[0] = 0x00;
+	HAL_I2C_Master_Transmit(hi2c2_new, 0x48 << 1, dataPacket, 1 ,HAL_MAX_DELAY);
+	HAL_Delay(10);
+	HAL_I2C_Master_Receive(hi2c2_new, 0x48 << 1, dataPacket, 2, HAL_MAX_DELAY);
+	valueFromRegister = (dataPacket[0] << 8 | dataPacket[1] );
+	return valueFromRegister * (4.096/32768.0); //zakres pomiarowy/2^15 (bo 2x8 bitów)
 }
+
 float getValueAdcExtCh2(void) {
-#define ADS1115_ADDRESS 0x48
-	unsigned char ADSwrite[6];
-	int16_t reading;
-	volatile float voltage;
-	const float voltageConv = 6.114 / 32768.0;
-	ADSwrite[0] = 0x01;
-	ADSwrite[1] = 0xE1; //11000001
-	ADSwrite[2] = 0x83; //10000011 LSB
-
-	HAL_I2C_Master_Transmit(hi2c2_new, ADS1115_ADDRESS << 1, ADSwrite, 3, 100);
-	ADSwrite[0] = 0x00;
-	HAL_I2C_Master_Transmit(hi2c2_new, ADS1115_ADDRESS << 1 , ADSwrite, 1 ,100);
-	HAL_Delay(20);
-
-	HAL_I2C_Master_Receive(hi2c2_new, ADS1115_ADDRESS <<1, ADSwrite, 2, 100);
-	reading = (ADSwrite[0] << 8 | ADSwrite[1] );
-	if(reading < 0) {
-		reading = 0;
-	}
-	return voltage = reading * voltageConv;
+	unsigned char dataPacket[6];
+	int16_t valueFromRegister;
+	dataPacket[0] = 0x01;
+	dataPacket[1] = 0xE3;
+	dataPacket[2] = 0x83;
+	HAL_I2C_Master_Transmit(hi2c2_new, 0x48 << 1, dataPacket, 3, HAL_MAX_DELAY);
+	dataPacket[0] = 0x00;
+	HAL_I2C_Master_Transmit(hi2c2_new, 0x48 << 1, dataPacket, 1 ,HAL_MAX_DELAY);
+	HAL_Delay(10);
+	HAL_I2C_Master_Receive(hi2c2_new, 0x48 << 1, dataPacket, 2, HAL_MAX_DELAY);
+	valueFromRegister = (dataPacket[0] << 8 | dataPacket[1] );
+	return valueFromRegister * (4.096/32768.0); //zakres pomiarowy/2^15 (bo 2x8 bitów)
 }
+
 float getValueAdcExtCh3(void) {
-#define ADS1115_ADDRESS 0x48
-	unsigned char ADSwrite[6];
-	int16_t reading;
-	volatile float voltage;
-	const float voltageConv = 6.114 / 32768.0;
-	ADSwrite[0] = 0x01;
-	ADSwrite[1] = 0xF1; //11000001
-	ADSwrite[2] = 0x83; //10000011 LSB
-
-	HAL_I2C_Master_Transmit(hi2c2_new, ADS1115_ADDRESS << 1, ADSwrite, 3, 100);
-	ADSwrite[0] = 0x00;
-	HAL_I2C_Master_Transmit(hi2c2_new, ADS1115_ADDRESS << 1 , ADSwrite, 1 ,100);
-	HAL_Delay(20);
-
-	HAL_I2C_Master_Receive(hi2c2_new, ADS1115_ADDRESS <<1, ADSwrite, 2, 100);
-	reading = (ADSwrite[0] << 8 | ADSwrite[1] );
-	if(reading < 0) {
-		reading = 0;
-	}
-	return voltage = reading * voltageConv;
+	unsigned char dataPacket[6];
+	int16_t valueFromRegister;
+	dataPacket[0] = 0x01;
+	dataPacket[1] = 0xF3;
+	dataPacket[2] = 0x83;
+	HAL_I2C_Master_Transmit(hi2c2_new, 0x48 << 1, dataPacket, 3, HAL_MAX_DELAY);
+	dataPacket[0] = 0x00;
+	HAL_I2C_Master_Transmit(hi2c2_new, 0x48 << 1, dataPacket, 1 ,HAL_MAX_DELAY);
+	HAL_Delay(10);
+	HAL_I2C_Master_Receive(hi2c2_new, 0x48 << 1, dataPacket, 2, HAL_MAX_DELAY);
+	valueFromRegister = (dataPacket[0] << 8 | dataPacket[1] );
+	return valueFromRegister * (4.096/32768.0); //zakres pomiarowy/2^15 (bo 2x8 bitów)
 }
+
 float getValueAdcIntCh0(void) {
 	uint32_t value;
 	adc_select_ch(ADC_CHANNEL_0);
 	HAL_ADC_Start(hadc1_new);
 	HAL_ADC_PollForConversion(hadc1_new, HAL_MAX_DELAY);
 	value = HAL_ADC_GetValue(hadc1_new);
-	float voltage = 3.3f * value / 4096.0f;
-	//sprintf(adcStr, "a3=%lu (%.3f V)\n\r", value, voltage);
-	return voltage;
-	//send_uart(adcStr);
+	return 3.3f * value / 4096.0f;
+
 }
 float getValueAdcIntCh1(void) {
 	uint32_t value;
@@ -165,10 +110,8 @@ float getValueAdcIntCh1(void) {
 	HAL_ADC_Start(hadc1_new);
 	HAL_ADC_PollForConversion(hadc1_new, HAL_MAX_DELAY);
 	value = HAL_ADC_GetValue(hadc1_new);
-	float voltage = 3.3f * value / 4096.0f;
-	//sprintf(adcStr, "a3=%lu (%.3f V)\n\r", value, voltage);
-	return voltage;
-	//send_uart(adcStr);
+	return 3.3f * value / 4096.0f;
+
 }
 float getValueAdcIntCh2(void) {
 	uint32_t value;
@@ -176,10 +119,7 @@ float getValueAdcIntCh2(void) {
 	HAL_ADC_Start(hadc1_new);
 	HAL_ADC_PollForConversion(hadc1_new, HAL_MAX_DELAY);
 	value = HAL_ADC_GetValue(hadc1_new);
-	float voltage = 3.3f * value / 4096.0f;
-	//sprintf(adcStr, "a3=%lu (%.3f V)\n\r", value, voltage);
-	return voltage;
-	//send_uart(adcStr);
+	return 3.3f * value / 4096.0f;
 }
 float getValueAdcIntCh3(void) {
 	uint32_t value;
@@ -187,8 +127,5 @@ float getValueAdcIntCh3(void) {
 	HAL_ADC_Start(hadc1_new);
 	HAL_ADC_PollForConversion(hadc1_new, HAL_MAX_DELAY);
 	value = HAL_ADC_GetValue(hadc1_new);
-	float voltage = 3.3f * value / 4096.0f;
-	//sprintf(adcStr, "a3=%lu (%.3f V)\n\r", value, voltage);
-	return voltage;
-	//send_uart(adcStr);
+	return 3.3f * value / 4096.0f;
 }

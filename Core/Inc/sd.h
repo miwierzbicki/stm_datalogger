@@ -17,8 +17,7 @@ extern bool sdReady;
 extern volatile FRESULT fresult;
 extern BYTE SD_SAVEMODE;
 void sd_init();
-uint32_t sd_totalspace();
-uint32_t sd_freespace();
+
 void sd_readfile();
 FRESULT sd_openfile();
 FRESULT sd_writeline(const char* sdWriteBuff);

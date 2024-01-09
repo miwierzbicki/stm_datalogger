@@ -16,7 +16,7 @@ float getValueDs3(void);
 void delay_us(uint32_t us);
 void ds18_init(TIM_HandleTypeDef *htim10);
 
-HAL_StatusTypeDef oneWireReset(void);
+void oneWireReset(void);
 void bitWrite(int value);
 int bitRead(void);
 void oneWireWrite(uint8_t byte);

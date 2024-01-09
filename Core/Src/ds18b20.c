@@ -14,7 +14,7 @@ TIM_HandleTypeDef *htim10_new;
 
 const uint8_t ds1addr[] = {0x28, 0x0, 0x2f, 0xfd, 0x5, 0x0, 0x0, 0x50};
 const uint8_t ds2addr[] = {0x28, 0xc3, 0xa5, 0xfd, 0x5, 0x0, 0x0, 0xe0};
-const uint8_t ds3addr[];
+const uint8_t ds3addr[] = {0x28, 0xc3, 0xa5, 0xfd, 0x5, 0x0, 0x0, 0xe0}; //ten sam adres 2 czujnika
 
 
 float getValueDs1(void) {
@@ -57,9 +57,8 @@ float getValueDs2(void) {
 		oneWireWrite(ds2addr[i]);
 	}
 	oneWireWrite(0xbe);
-	int i;
 	uint8_t rom_code[9];
-	for (i = 0; i < 9; i++)
+	for (int i = 0; i < 9; i++)
 	  rom_code[i] = oneWireRead();
 	float temp= ((rom_code[1]<<8) | (rom_code[0]));
 
@@ -69,7 +68,25 @@ float getValueDs2(void) {
 }
 
 float getValueDs3(void) {
-	return 0.0;
+	oneWireReset();
+	oneWireWrite(0x55);
+
+	for(int i=0; i<8; i++) {
+		oneWireWrite(ds3addr[i]);
+	}
+	oneWireWrite(0x44);
+	HAL_Delay(95);
+	oneWireReset();
+	oneWireWrite(0x55);
+	for(int i=0; i<8; i++) {
+		oneWireWrite(ds3addr[i]);
+	}
+	oneWireWrite(0xbe);
+	uint8_t rom_code[9];
+	for (int i = 0; i < 9; i++)
+	  rom_code[i] = oneWireRead();
+	float temp= ((rom_code[1]<<8) | (rom_code[0]));
+	return temp = temp/16.0f;
 }
 
 
@@ -84,35 +101,29 @@ void delay_us(uint32_t us)
 	  while (__HAL_TIM_GET_COUNTER(htim10_new) < us) {}
 }
 
-HAL_StatusTypeDef oneWireReset(void)
+void oneWireReset(void)
 {
-  int rc;
-
   HAL_GPIO_WritePin(DSO_DATA_GPIO_Port, DSO_DATA_Pin, GPIO_PIN_RESET);
   delay_us(480);
   HAL_GPIO_WritePin(DSO_DATA_GPIO_Port, DSO_DATA_Pin, GPIO_PIN_SET);
   delay_us(70);
-  rc = HAL_GPIO_ReadPin(DSO_DATA_GPIO_Port, DSO_DATA_Pin);
+  HAL_GPIO_ReadPin(DSO_DATA_GPIO_Port, DSO_DATA_Pin);
   delay_us(410);
 
-  if (rc == 0)
-    return HAL_OK;
-  else
-    return HAL_ERROR;
 }
 
 void bitWrite(int value)
 {
   if (value) {
     HAL_GPIO_WritePin(DSO_DATA_GPIO_Port, DSO_DATA_Pin, GPIO_PIN_RESET);
-    delay_us(6);
+    delay_us(10);
     HAL_GPIO_WritePin(DSO_DATA_GPIO_Port, DSO_DATA_Pin, GPIO_PIN_SET);
-    delay_us(64);
+    delay_us(65);
   } else {
     HAL_GPIO_WritePin(DSO_DATA_GPIO_Port, DSO_DATA_Pin, GPIO_PIN_RESET);
-    delay_us(60);
+    delay_us(65);
     HAL_GPIO_WritePin(DSO_DATA_GPIO_Port, DSO_DATA_Pin, GPIO_PIN_SET);
-    delay_us(10);
+    delay_us(20);
   }
 }
 
@@ -121,31 +132,34 @@ int bitRead(void)
 {
   int rc;
   HAL_GPIO_WritePin(DSO_DATA_GPIO_Port, DSO_DATA_Pin, GPIO_PIN_RESET);
-  delay_us(6);
+  delay_us(10);
   HAL_GPIO_WritePin(DSO_DATA_GPIO_Port, DSO_DATA_Pin, GPIO_PIN_SET);
-  delay_us(9);
+  delay_us(15);
   rc = HAL_GPIO_ReadPin(DSO_DATA_GPIO_Port, DSO_DATA_Pin);
-  delay_us(55);
+  delay_us(70);
   return rc;
 }
 
-void oneWireWrite(uint8_t byte)
+void oneWireWrite(uint8_t b)
 {
-  int i;
-  for (i = 0; i < 8; i++) {
-    bitWrite(byte & 0x01);
-    byte >>= 1;
+	int i=0;
+	while(i<8) {
+		bitWrite(b & 1);
+		b >>= 1;
+		i++;
   }
 }
 
 uint8_t oneWireRead(void)
 {
   uint8_t value = 0;
-  int i;
-  for (i = 0; i < 8; i++) {
+  int i=0;
+  while (i<8) {
     value >>= 1;
-    if (bitRead())
-      value |= 0x80;
+    if (bitRead()) {
+    	value = value | 0x80;
+    }
+    i++;
   }
   return value;
 }

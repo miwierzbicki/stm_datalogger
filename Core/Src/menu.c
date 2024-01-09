@@ -14,7 +14,7 @@
 
 uint16_t encoderMin;
 uint16_t encoderMax;
-volatile Screen screen = MAIN_MENU; //instancja enuma Screen, aktualny stan menu
+volatile Screen screen = MAIN_MENU;
 int sensorAdcExt=0;
 UART_HandleTypeDef *huart6_new;
 RTC_HandleTypeDef *hrtc_new;
@@ -28,18 +28,17 @@ void sendRtcHandler(RTC_HandleTypeDef *hrtc) {
 	hrtc_new=hrtc;
 }
 
-void backButton(uint8_t back_pos, uint8_t target_screen, uint16_t encoder_pos) { //usunac encoder_pos bo nieuzywane
+void backButton(uint8_t back_pos, uint8_t target_screen) {
 	ssd1306_SetCursor(0, 56);
 	ssd1306_WriteString("COFNIJ", Font_6x8, entrySelected(back_pos) ? Black : White);
 	if(entryClicked(back_pos)) {
 		encSetPos(0);
-		//confirm=true;
 		screen = target_screen;
 	}
 }
 
 void listAllItemsFromMenu(Menu *menu) {
-	for (int i = 0; i < menu->entry_count; ++i) { //-> bo entry_count na stercie cpu jest (heap)
+	for (int i = 0; i < menu->entry_count; ++i) {
 			ssd1306_SetCursor(0, i*10);
 			if(entryClicked(i)) {
 				screen = menu->entries[i].entry;
@@ -52,11 +51,7 @@ void listAllItemsFromMenu(Menu *menu) {
 void drawMainMenu(Menu *menu) {
 	encSetRange(0, 4);
 	listAllItemsFromMenu(menu);
-	uint32_t encVal = encoderGet();
-	char charArVal[4];
-	sprintf(charArVal, "%lu", encVal);
-	ssd1306_SetCursor(0, 44);
-	ssd1306_WriteString(charArVal, Font_7x10, White);
+
 	ssd1306_SetCursor(0, 54);
 	ssd1306_WriteString(getRtcString(), Font_7x10, White);
 
@@ -65,7 +60,7 @@ void drawMainMenu(Menu *menu) {
 void drawSensorConfig(Menu *menu) {
 	encSetRange(0, 3);
 	listAllItemsFromMenu(menu);
-	backButton(3, MAIN_MENU, 1);
+	backButton(3, MAIN_MENU);
 }
 
 
@@ -74,7 +69,7 @@ char strDataOverwrite[6];
 char* unmountString="";
 char* restartAlertString="";
 void drawSdConfig(Menu *menu) {
-//	detSd();
+
 	encSetRange(0, 2);
 	ssd1306_SetCursor(0, 0);
 	ssd1306_WriteString("SD status:", Font_7x10, White);
@@ -92,14 +87,7 @@ void drawSdConfig(Menu *menu) {
 		ssd1306_WriteString(getFresultString(fresult), Font_7x10, White);
 		ssd1306_SetCursor(0, 10);
 		ssd1306_WriteString("Overwrite: ", Font_7x10, entrySelected(0) ? Black : White);
-//		if(entrySelected(0) && entryClicked(0)) {
-//					if(dataOverwrite==false) {
-//						dataOverwrite=true;
-//					}
-//					else {
-//						dataOverwrite=false;
-//					}
-//		}
+
 		ssd1306_SetCursor(75, 10);
 		sprintf(strDataOverwrite, "%s", dataOverwrite ? "true" : "false");
 		ssd1306_WriteString(strDataOverwrite, Font_7x10, entrySelected(0) ? Black : White);
@@ -120,28 +108,25 @@ void drawSdConfig(Menu *menu) {
 		ssd1306_SetCursor(0,40);
 		ssd1306_WriteString(restartAlertString, Font_7x10, White);
 	}
-	backButton(2, MAIN_MENU, 0);
+	backButton(2, MAIN_MENU);
 }
-
-
 
 
 void drawSensorConfigAdcExt(Menu *menu) {
 	encSetRange(0, 4);
 	listAllItemsFromMenu(menu);
-	backButton(4, MAIN_MENU, 4);
+	backButton(4, MAIN_MENU);
 }
 void drawSensorConfigAdcInt(Menu *menu) {
 	encSetRange(0, 4);
 	listAllItemsFromMenu(menu);
-	backButton(4, MAIN_MENU, 4);
+	backButton(4, MAIN_MENU);
 }
 void drawSensorConfigDS18(Menu *menu) {
 	encSetRange(0, 1);
 	listAllItemsFromMenu(menu);
-	backButton(3, MAIN_MENU, 3);
+	backButton(3, MAIN_MENU);
 }
-
 
 
 Sensors sensors[] = {
@@ -173,7 +158,7 @@ MapSensors mapSensors[] = {
 
 };
 
-uint16_t samplingRates[] = {10,50,100,500};
+uint16_t samplingRates[] = {500,1000,2000,4000};
 volatile uint8_t  samplingIndex = 0;
 volatile int counter=0;
 char sampl1str[10]="???";
@@ -197,7 +182,7 @@ void drawSensorOptions(uint8_t index) {
 	ssd1306_SetCursor(90, 28);
 	sprintf(sampl1str, "%d\n\r", sensors[index].samplingRate);
 	ssd1306_WriteString(sampl1str, Font_7x10, entrySelected(1) ? Black : White);
-	if(entrySelected(1) && entryClicked(1)) { //tu sie dzieje cos dziwnego
+	if(entrySelected(1) && entryClicked(1)) {
 		//send_uart("klikniete\n\r");
 		counter++;
 		if(counter>4) {
@@ -213,18 +198,16 @@ void drawSensorConfigGeneric(Menu *menu) {
 	encSetRange(0, 2);
 	ssd1306_SetCursor(0, 0);
 	drawSensorOptions(screen-SENSOR_CONFIG_ADC_EXT0);
-	backButton(2, MAIN_MENU, 2);
+	backButton(2, MAIN_MENU);
 }
 volatile char result[1000]="";
 volatile float value;
 volatile char temp[50];
 void ch1Enable(void) {
-
-
 	for(int i=0; i<11; i++) {
-		if(sensors[i].samplingRate==10 && sensors[i].isEnabled) {
+		if(sensors[i].samplingRate==500 && sensors[i].isEnabled) {
 			for(int j=0; j<sizeof(mapSensors)/sizeof(MapSensors); j++) {
-				if(strcmp(sensors[i].name, mapSensors[j].sensorName)==0) { //zamiast tego
+				if(strcmp(sensors[i].name, mapSensors[j].sensorName)==0) {
 					value = mapSensors[j].function();
 					sensors[i].lastValue=value;
 					sensors[i].hasValue=true;
@@ -238,46 +221,39 @@ void ch1Enable(void) {
 
 void ch2Enable(void) {
 	for(int i=0; i<11; i++) {
-			if(sensors[i].samplingRate==50 && sensors[i].isEnabled) {
+			if(sensors[i].samplingRate==1000 && sensors[i].isEnabled) {
 				for(int j=0; j<sizeof(mapSensors)/sizeof(MapSensors); j++) {
-					if(strcmp(sensors[i].name, mapSensors[j].sensorName)==0) { //zamiast tego
+					if(strcmp(sensors[i].name, mapSensors[j].sensorName)==0) {
 						value = mapSensors[j].function();
 						sensors[i].lastValue=value;
 						sensors[i].hasValue=true;
 					}
 				}
-
 			}
-			else {
-
-			}
-
+			else {}
 		}
 }
 
 void ch3Enable(void) {
 	for(int i=0; i<11; i++) {
-			if(sensors[i].samplingRate==100 && sensors[i].isEnabled) {
+			if(sensors[i].samplingRate==2000 && sensors[i].isEnabled) {
 				for(int j=0; j<sizeof(mapSensors)/sizeof(MapSensors); j++) {
-					if(strcmp(sensors[i].name, mapSensors[j].sensorName)==0) { //zamiast tego
+					if(strcmp(sensors[i].name, mapSensors[j].sensorName)==0) {
 						value = mapSensors[j].function();
 						sensors[i].lastValue=value;
 						sensors[i].hasValue=true;
 					}
 				}
 			}
-			else {
-
-			}
-
+			else {}
 		}
 }
 
 void ch4Enable(void) {
 	for(int i=0; i<11; i++) {
-			if(sensors[i].samplingRate==500 && sensors[i].isEnabled) {
+			if(sensors[i].samplingRate==4000 && sensors[i].isEnabled) {
 				for(int j=0; j<sizeof(mapSensors)/sizeof(MapSensors); j++) {
-					if(strcmp(sensors[i].name, mapSensors[j].sensorName)==0) { //zamiast tego
+					if(strcmp(sensors[i].name, mapSensors[j].sensorName)==0) {
 						value = mapSensors[j].function();
 						sensors[i].lastValue=value;
 						sensors[i].hasValue=true;
@@ -308,10 +284,11 @@ void debugAdcInt(Menu *menu) {
 	ssd1306_SetCursor(0, 50);
 	sprintf(str, "ds18_2=%.2f C", getValueDs2());
 	ssd1306_WriteString(str, Font_7x10, White);
-	backButton(1, MAIN_MENU, 1);
+	backButton(1, MAIN_MENU);
 }
 
 void debugAdcExt(Menu *menu) {
+	encSetRange(0,1);
 	char str[40];
 	sprintf(str, "ext_ch0=%.3f V", getValueAdcExtCh0());
 	ssd1306_SetCursor(0, 0);
@@ -326,7 +303,7 @@ void debugAdcExt(Menu *menu) {
 	sprintf(str, "ext_ch3=%.3f V", getValueAdcExtCh3());
 	ssd1306_WriteString(str, Font_7x10, White);
 
-	backButton(1, MAIN_MENU, 1);
+	backButton(1, MAIN_MENU);
 }
 
 void testAllSensors(Menu *menu) {
@@ -335,7 +312,7 @@ void testAllSensors(Menu *menu) {
 	        sensors[i].isEnabled = true;
 	        sensors[i].samplingRate = 10;
 	    }
-	backButton(1, MAIN_MENU, 1);
+	backButton(1, MAIN_MENU);
 }
 
 char *measureStatusStr="";
@@ -410,50 +387,17 @@ void drawOnoffMeasure(Menu *menu) {
 		ssd1306_WriteString(restartDetSdString, Font_6x8, White);
 	}
 
-
-
-//	for(int i=0; i<11; i++) {
-//		if(sensors[i].isEnabled) {
-//			sprintf(sensorDetailsStr, "%s: %d\n\r", sensors[i].name, sensors[i].samplingRate);
-//			ssd1306_SetCursor(0, currPos+8);
-//			currPos=currPos+8;
-//			ssd1306_WriteString(sensorDetailsStr, Font_6x8, White); //za mało miejsca na ekranie -> (???)
-//		}
-//	}
-
-
-
-	//ssd1306_WriteString(rtcTimeStr, Font_7x10, White);
-//	ssd1306_SetCursor(0, 26);
-//	ssd1306_WriteString("adc/READ buff", Font_7x10, entrySelected(1) ? Black : White);
-//	if(entrySelected(1) && entryClicked(1)) {
-////		volatile const char *dataFromBuff = CircularBuffer_Read(&cb);
-////		if(dataFromBuff==NULL) {
-////			send_uart("Bufor jest pusty\n\r");
-////		}
-////		else {
-////			send_uart(dataFromBuff);
-////		}
-//		getValAdc();
-//		sd_readfile();
-//		sd_closefile();
-	//}
-	//ssd1306_WriteString(rtcDateStr, Font_7x10, White);
-
-	backButton(2, MAIN_MENU, 2);
+	backButton(2, MAIN_MENU);
 
 }
-
-
-
 
 Menu menu[] = {
 	[MAIN_MENU]={drawMainMenu, 5,
 			{{SENSOR_CONFIG, "Konfig. czuj."},
 			{SD_CONFIG, "SD konfig."},
 			{ONOFF_MEASURE, "Start pomiaru"},
-			{DEBUG_ADC_INT, "Debug ADC INT"},
-			{DEBUG_ADC_EXT, "Debug ADC_EXT"}
+			{DEBUG_ADC_INT, "ADC INT"},
+			{DEBUG_ADC_EXT, "ADC_EXT"}
 			}
 	},
 	[SENSOR_CONFIG]={drawSensorConfig, 3,
@@ -505,10 +449,7 @@ Menu menu[] = {
 
 void displayMenu(void) {
 	ssd1306_Fill(Black);
-
 	menu[screen].function(&menu[screen]);
 	ssd1306_UpdateScreen();
-	//clearEncButton();
 	HAL_Delay(1);
-
 }
