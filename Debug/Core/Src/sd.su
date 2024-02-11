@@ -1,7 +1,7 @@
-../Core/Src/sd.c:28:6:sd_demount	8	static
-../Core/Src/sd.c:33:6:sd_init	8	static
-../Core/Src/sd.c:50:6:sd_readfile	8	static
-../Core/Src/sd.c:67:9:sd_openfile	24	static
-../Core/Src/sd.c:90:9:sd_writeline	16	static
-../Core/Src/sd.c:115:6:sd_closefile	8	static
-../Core/Src/sd.c:122:13:getFresultString	16	static
+../Core/Src/sd.c:27:6:sd_demount	8	static
+../Core/Src/sd.c:32:6:sd_init	8	static
+../Core/Src/sd.c:49:6:sd_readfile	8	static
+../Core/Src/sd.c:66:9:sd_openfile	24	static
+../Core/Src/sd.c:89:9:sd_writeline	16	static
+../Core/Src/sd.c:114:6:sd_closefile	8	static
+../Core/Src/sd.c:121:13:getFresultString	16	static

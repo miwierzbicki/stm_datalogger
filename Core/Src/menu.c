@@ -51,9 +51,8 @@ void listAllItemsFromMenu(Menu *menu) {
 void drawMainMenu(Menu *menu) {
 	encSetRange(0, 4);
 	listAllItemsFromMenu(menu);
-
-	ssd1306_SetCursor(0, 54);
-	ssd1306_WriteString(getRtcString(), Font_7x10, White);
+	//ssd1306_SetCursor(0, 50);
+	//ssd1306_WriteString(getRtcString(), Font_7x10, White); //do wyswietlenia daty i godziny
 
 }
 
@@ -70,37 +69,37 @@ char* unmountString="";
 char* restartAlertString="";
 void drawSdConfig(Menu *menu) {
 
-	encSetRange(0, 2);
+	encSetRange(0, 3);
 	ssd1306_SetCursor(0, 0);
-	ssd1306_WriteString("SD status:", Font_7x10, White);
+	ssd1306_WriteString("stan SD:", Font_7x10, White);
 	ssd1306_SetCursor(70, 0);
 	if(!sdReady) {
 		ssd1306_WriteString(" ERROR", Font_7x10, White);
 		ssd1306_SetCursor(0, 10);
 		ssd1306_WriteString(getFresultString(fresult), Font_7x10, White);
 		ssd1306_SetCursor(0, 20);
-		ssd1306_WriteString("Start forbidden", Font_7x10, White);
+		ssd1306_WriteString("Start zablokow.", Font_7x10, White);
 		leds[2].state=true;
 
 	}
 	else {
 		ssd1306_WriteString(getFresultString(fresult), Font_7x10, White);
 		ssd1306_SetCursor(0, 10);
-		ssd1306_WriteString("Overwrite: ", Font_7x10, entrySelected(0) ? Black : White);
+		ssd1306_WriteString("Nadpisywanie: ", Font_7x10, entrySelected(0) ? Black : White);
 
 		ssd1306_SetCursor(75, 10);
 		sprintf(strDataOverwrite, "%s", dataOverwrite ? "true" : "false");
 		ssd1306_WriteString(strDataOverwrite, Font_7x10, entrySelected(0) ? Black : White);
 		ssd1306_SetCursor(0,20);
-		ssd1306_WriteString("Unmount SD", Font_7x10, entrySelected(1) ? Black : White);
+		ssd1306_WriteString("Odmontuj SD", Font_7x10, entrySelected(1) ? Black : White);
 
 		if(entrySelected(1) && entryClicked(1)) {
 			sd_demount();
 			sdUnmounted=true;
 			unmountString="                    ";
-			unmountString="Unmount SD success";
+			unmountString="Odmont. SD OK";
 			restartAlertString="                  ";
-			restartAlertString="RESTART NEEDED!";
+			restartAlertString="Konieczny RST!";
 			leds[2].state=true;
 		}
 		ssd1306_SetCursor(0,30);
@@ -108,7 +107,9 @@ void drawSdConfig(Menu *menu) {
 		ssd1306_SetCursor(0,40);
 		ssd1306_WriteString(restartAlertString, Font_7x10, White);
 	}
-	backButton(2, MAIN_MENU);
+	ssd1306_SetCursor(0, 46);
+	ssd1306_WriteString("Pobierz adresy DS", Font_7x10, entrySelected(2) ? Black : White);
+	backButton(3, MAIN_MENU);
 }
 
 
@@ -175,11 +176,11 @@ void drawSensorOptions(uint8_t index) {
 			sensors[index].isEnabled=false;
 		}
 	}
-	sprintf(isEnabledStr, "enabled: %s", sensors[index].isEnabled ? "true" : "false");
+	sprintf(isEnabledStr, "Stan: %s", sensors[index].isEnabled ? "ON" : "OFF");
 	ssd1306_WriteString(isEnabledStr, Font_7x10, entrySelected(0) ? Black : White);
 	ssd1306_SetCursor(0, 28);
-	ssd1306_WriteString("period [ms]: ", Font_7x10, White);
-	ssd1306_SetCursor(90, 28);
+	ssd1306_WriteString("Freq [ms]: ", Font_7x10, White);
+	ssd1306_SetCursor(70, 28);
 	sprintf(sampl1str, "%d\n\r", sensors[index].samplingRate);
 	ssd1306_WriteString(sampl1str, Font_7x10, entrySelected(1) ? Black : White);
 	if(entrySelected(1) && entryClicked(1)) {
@@ -269,16 +270,16 @@ void debugAdcInt(Menu *menu) {
 	encSetRange(0,1);
 	ssd1306_SetCursor(0, 0);
 	char str[40];
-	sprintf(str, "int_ch0=%.3f V", getValueAdcIntCh0());
+	sprintf(str, "int ch0=%.3f V", getValueAdcIntCh0());
 	ssd1306_WriteString(str, Font_7x10, White);
 	ssd1306_SetCursor(0, 10);
-	sprintf(str, "int_ch1=%.3f V", getValueAdcIntCh1());
+	sprintf(str, "int ch1=%.3f V", getValueAdcIntCh1());
 	ssd1306_WriteString(str, Font_7x10, White);
 	ssd1306_SetCursor(0, 20);
-	sprintf(str, "int_ch2=%.3f V", getValueAdcIntCh2());
+	sprintf(str, "int ch2=%.3f V", getValueAdcIntCh2());
 	ssd1306_WriteString(str, Font_7x10, White);
 	ssd1306_SetCursor(0, 30);
-	sprintf(str, "int_ch3=%.3f V", getValueAdcIntCh3());
+	sprintf(str, "int ch3=%.3f V", getValueAdcIntCh3());
 	ssd1306_WriteString(str, Font_7x10, White);
 
 	ssd1306_SetCursor(0, 50);
@@ -290,17 +291,17 @@ void debugAdcInt(Menu *menu) {
 void debugAdcExt(Menu *menu) {
 	encSetRange(0,1);
 	char str[40];
-	sprintf(str, "ext_ch0=%.3f V", getValueAdcExtCh0());
+	sprintf(str, "ext ch0=%.3f V", getValueAdcExtCh0());
 	ssd1306_SetCursor(0, 0);
 	ssd1306_WriteString(str, Font_7x10, White);
 	ssd1306_SetCursor(0, 10);
-	sprintf(str, "ext_ch1=%.3f V", getValueAdcExtCh1());
+	sprintf(str, "ext ch1=%.3f V", getValueAdcExtCh1());
 	ssd1306_WriteString(str, Font_7x10, White);
 	ssd1306_SetCursor(0, 20);
-	sprintf(str, "ext_ch2=%.3f V", getValueAdcExtCh2());
+	sprintf(str, "ext ch2=%.3f V", getValueAdcExtCh2());
 	ssd1306_WriteString(str, Font_7x10, White);
 	ssd1306_SetCursor(0, 30);
-	sprintf(str, "ext_ch3=%.3f V", getValueAdcExtCh3());
+	sprintf(str, "ext ch3=%.3f V", getValueAdcExtCh3());
 	ssd1306_WriteString(str, Font_7x10, White);
 
 	backButton(1, MAIN_MENU);
@@ -326,17 +327,17 @@ void drawOnoffMeasure(Menu *menu) {
 		ssd1306_SetCursor(0, 18);
 		ssd1306_WriteString(getFresultString(fresult), Font_7x10, White);
 		ssd1306_SetCursor(0, 28);
-		ssd1306_WriteString("RESTART NEEDED!", Font_7x10, White);
+		ssd1306_WriteString("WYMAG. RESET!", Font_7x10, White);
 		leds[2].state=true;
 		currPos=0;
 	}
 	else if(sdUnmounted) {
 		ssd1306_SetCursor(0, 0);
-		ssd1306_WriteString("RESTART", Font_11x18, White);
+		ssd1306_WriteString("WYMAG.", Font_11x18, White);
 		ssd1306_SetCursor(0, 18);
-		ssd1306_WriteString("NEEDED", Font_11x18, White);
+		ssd1306_WriteString("RESTART", Font_11x18, White);
 		ssd1306_SetCursor(0, 36);
-		ssd1306_WriteString("after unmounting SD!", Font_6x8, White);
+		ssd1306_WriteString("po odmont. SD!", Font_6x8, White);
 		leds[2].state=true;
 	}
 	else {
@@ -355,7 +356,7 @@ void drawOnoffMeasure(Menu *menu) {
 		if(entrySelected(0) && entryClicked(0)) {
 			if(debug) {
 				measureStatusStr="                ";
-				measureStatusStr="Already started!";
+				measureStatusStr="Juz rozpoczeto!";
 			}
 			else {
 				if(sd_openfile()==FR_OK) {
@@ -363,13 +364,13 @@ void drawOnoffMeasure(Menu *menu) {
 						sd_writeline("timestamp,adc_ext_ch0,adc_ext_ch1,adc_ext_ch2,adc_ext_ch3,adc_int_ch0,adc_int_ch1,adc_int_ch2,adc_int_ch3,ds18b20_1,ds18b20_2,ds18b20_3\n");
 						debug=true;
 						measureStatusStr="                ";
-						measureStatusStr="Measure started";
+						measureStatusStr="Pomiar rozpocz.";
 					}
 				}
 				else {
 					measureStatusStr="                ";
-					measureStatusStr="SD not detected!";
-					restartDetSdString="Restart needed";
+					measureStatusStr="Nie wykryt. SD!";
+					restartDetSdString="Wymag. RST";
 					leds[2].state=true;
 				}
 			}
@@ -379,7 +380,7 @@ void drawOnoffMeasure(Menu *menu) {
 			sd_closefile();
 			//sd_demount();
 			measureStatusStr="                ";
-			measureStatusStr="Measure stopped";
+			measureStatusStr="Pomiar zakonczony";
 		}
 		ssd1306_SetCursor(0, 36);
 		ssd1306_WriteString(measureStatusStr, Font_6x8, White);
@@ -392,12 +393,13 @@ void drawOnoffMeasure(Menu *menu) {
 }
 
 Menu menu[] = {
-	[MAIN_MENU]={drawMainMenu, 5,
+	[MAIN_MENU]={drawMainMenu, 6,
 			{{SENSOR_CONFIG, "Konfig. czuj."},
-			{SD_CONFIG, "SD konfig."},
+			{SD_CONFIG, "Konfiguracja"},
 			{ONOFF_MEASURE, "Start pomiaru"},
-			{DEBUG_ADC_INT, "ADC INT"},
-			{DEBUG_ADC_EXT, "ADC_EXT"}
+			{DEBUG_ADC_INT, ">ADC INT"},
+			{DEBUG_ADC_EXT, ">ADC EXT"},
+			{DEBUG_ADC_EXT, ">DS18B20"},
 			}
 	},
 	[SENSOR_CONFIG]={drawSensorConfig, 3,
