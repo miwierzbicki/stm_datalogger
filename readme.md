@@ -20,7 +20,7 @@ Założeniem projektu było stworzenie konfigurowalnego, małego rejestratora da
 ### Główne pliki projektu w repozytorium
 ```
 \Core\src\*.c
-\Core\inc\*.h
+\Core\inc\*.h 
 ```
 
 ## Projekt PCB
