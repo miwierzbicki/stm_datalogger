@@ -17,10 +17,13 @@ extern bool sdReady;
 extern volatile FRESULT fresult;
 extern BYTE SD_SAVEMODE;
 void sd_init();
-
+void readAddressesFromFile(const char *filename, char *fileBuffer);
 void sd_readfile();
 FRESULT sd_openfile();
 FRESULT sd_writeline(const char* sdWriteBuff);
 void sd_closefile();
 void sd_demount();
 const char* getFresultString(FRESULT fr);
+extern volatile uint8_t ds1addr[8];
+extern volatile uint8_t ds2addr[8];
+extern volatile uint8_t ds3addr[8];

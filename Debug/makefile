@@ -68,8 +68,8 @@ all: main-build
 main-build: stm32_test.elf secondary-outputs
 
 # Tool invocations
-stm32_test.elf stm32_test.map: $(OBJS) $(USER_OBJS) C:\Users\mwier\STM32CubeIDE\workspace_1.13.2\stm32_test\STM32F411CEUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "stm32_test.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\mwier\STM32CubeIDE\workspace_1.13.2\stm32_test\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="stm32_test.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+stm32_test.elf stm32_test.map: $(OBJS) $(USER_OBJS) C:\Users\mwier\Desktop\stm_datalogger\STM32F411CEUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "stm32_test.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\mwier\Desktop\stm_datalogger\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="stm32_test.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

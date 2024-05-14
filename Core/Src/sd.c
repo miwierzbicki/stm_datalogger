@@ -95,7 +95,7 @@ FRESULT sd_writeline(const char* sdWriteBuff) {
 				leds[1].state=true;
 			}
 			line_count++;
-			if(line_count>=100) {
+			if(line_count>=20000) {
 				line_count=0;
 				sd_closefile();
 				sd_openfile();
@@ -145,3 +145,25 @@ const char* getFresultString(FRESULT fr)
         default:                      return "Unknown Error";
     }
 }
+
+void parseAddress(const char *addressString, uint8_t *addressArray) {
+    char *token = strtok((char *)addressString, "{}, ");
+    int i = 0;
+    while (token != NULL) {
+        addressArray[i++] = (uint8_t)strtol(token, NULL, 16);
+        token = strtok(NULL, "{}, ");
+    }
+}
+#define MAX_FILE_SIZE 70
+void readAddressFromFile(const char *filename, uint8_t *addressArray) {
+    char fileBuffer[MAX_FILE_SIZE];
+    memset(fileBuffer, 0, MAX_FILE_SIZE);
+    fresult = f_open(&fil, filename, FA_READ);
+    if (fresult == FR_OK) {
+        f_read(&fil, fileBuffer, MAX_FILE_SIZE, &br);
+        f_sync(&fil);
+        f_close(&fil);
+        parseAddress(fileBuffer, addressArray);
+    }
+}
+

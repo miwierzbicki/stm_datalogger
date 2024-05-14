@@ -15,9 +15,11 @@ float getValueDs2(void);
 float getValueDs3(void);
 void delay_us(uint32_t us);
 void ds18_init(TIM_HandleTypeDef *htim10);
-
+void displayAddress(void);
 void oneWireReset(void);
 void bitWrite(int value);
 int bitRead(void);
 void oneWireWrite(uint8_t byte);
 uint8_t oneWireRead(void);
+extern char addressTextLine1[30];
+extern char addressTextLine2[30];

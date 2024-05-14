@@ -20,10 +20,12 @@ typedef enum {
 	SENSOR_CONFIG_ADC_INT,
 	SENSOR_CONFIG_DS18,
 	SD_CONFIG,
+	DS18,
 	SD_CONFIG_SAVEMODE,
 	ONOFF_MEASURE,
 	DEBUG_ADC_INT,
 	DEBUG_ADC_EXT,
+	DEBUG_DS18,
 	SENSOR_CONFIG_ADC_EXT0,
 	SENSOR_CONFIG_ADC_EXT1,
 	SENSOR_CONFIG_ADC_EXT2,
@@ -34,7 +36,8 @@ typedef enum {
 	SENSOR_CONFIG_ADC_INT3,
 	SENSOR_CONFIG_DS18_1,
 	SENSOR_CONFIG_DS18_2,
-	SENSOR_CONFIG_DS18_3
+	SENSOR_CONFIG_DS18_3,
+	MAX_SCREEN
 
 }Screen;
 
@@ -69,10 +72,11 @@ typedef struct MenuEntry {
 typedef struct Menu Menu;
 
 struct Menu {
-   void (*function)( Menu *menu);
+   void (*function)( Menu *menu, bool ifFirstEntry);
    int entry_count;
    MenuEntry entries[8];
 };
+
 
 void displayMenu(void);
 #endif

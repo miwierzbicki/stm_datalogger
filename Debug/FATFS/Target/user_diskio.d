@@ -40,12 +40,12 @@ FATFS/Target/user_diskio.o: ../FATFS/Target/user_diskio.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
  ../Core/Inc/ds18b20.h \
- C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306_conf.h \
- C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306_fonts.h \
- C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306_conf.h \
- C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306_tests.h \
- C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306.h \
- C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306_fonts.h \
+ C:/Users/mwier/Desktop/stm_datalogger/Drivers/OLED/ssd1306_conf.h \
+ C:/Users/mwier/Desktop/stm_datalogger/Drivers/OLED/ssd1306_fonts.h \
+ C:/Users/mwier/Desktop/stm_datalogger/Drivers/OLED/ssd1306_conf.h \
+ C:/Users/mwier/Desktop/stm_datalogger/Drivers/OLED/ssd1306_tests.h \
+ C:/Users/mwier/Desktop/stm_datalogger/Drivers/OLED/ssd1306.h \
+ C:/Users/mwier/Desktop/stm_datalogger/Drivers/OLED/ssd1306_fonts.h \
  ../Core/Inc/oled.h ../Core/Inc/menu.h ../Core/Inc/main.h \
  ../Core/Inc/encoder.h ../Core/Inc/adc.h ../Core/Inc/user_diskio_spi.h \
  ../Middlewares/Third_Party/FatFs/src/integer.h \
@@ -93,12 +93,12 @@ FATFS/Target/user_diskio.o: ../FATFS/Target/user_diskio.c \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
 ../Core/Inc/ds18b20.h:
-C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306_conf.h:
-C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306_fonts.h:
-C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306_conf.h:
-C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306_tests.h:
-C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306.h:
-C:/Users/mwier/STM32CubeIDE/workspace_1.13.2/stm32_test/Drivers/OLED/ssd1306_fonts.h:
+C:/Users/mwier/Desktop/stm_datalogger/Drivers/OLED/ssd1306_conf.h:
+C:/Users/mwier/Desktop/stm_datalogger/Drivers/OLED/ssd1306_fonts.h:
+C:/Users/mwier/Desktop/stm_datalogger/Drivers/OLED/ssd1306_conf.h:
+C:/Users/mwier/Desktop/stm_datalogger/Drivers/OLED/ssd1306_tests.h:
+C:/Users/mwier/Desktop/stm_datalogger/Drivers/OLED/ssd1306.h:
+C:/Users/mwier/Desktop/stm_datalogger/Drivers/OLED/ssd1306_fonts.h:
 ../Core/Inc/oled.h:
 ../Core/Inc/menu.h:
 ../Core/Inc/main.h:

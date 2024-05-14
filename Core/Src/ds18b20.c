@@ -9,12 +9,40 @@
 #include <string.h>
 #include <stdbool.h>
 #include "encoder.h"
+#include "sd.h"
 
 TIM_HandleTypeDef *htim10_new;
 
-const uint8_t ds1addr[] = {0x28, 0x0, 0x2f, 0xfd, 0x5, 0x0, 0x0, 0x50};
-const uint8_t ds2addr[] = {0x28, 0xc3, 0xa5, 0xfd, 0x5, 0x0, 0x0, 0xe0};
-const uint8_t ds3addr[] = {0x28, 0xc3, 0xa5, 0xfd, 0x5, 0x0, 0x0, 0xe0}; //ten sam adres 2 czujnika
+volatile uint8_t ds1addr[];
+volatile uint8_t ds2addr[];
+volatile uint8_t ds3addr[];
+ char addressTextLine1[30];
+ char addressTextLine2[30];
+volatile uint8_t address[8];
+void displayAddress(void) {
+	memset(addressTextLine1, 0, sizeof(addressTextLine1));
+	memset(addressTextLine2, 0, sizeof(addressTextLine2));
+	char temp[5];
+	oneWireReset();
+	oneWireWrite(0x33);
+
+	for (int i = 0; i < 8; i++) {
+		address[i] = oneWireRead();
+		if(i<7) {
+			sprintf(temp, "0x%02X,", address[i]);
+		}
+		else {
+			sprintf(temp, "0x%02X", address[i]);
+		}
+		if (i < 4) {
+			strcat(addressTextLine1, temp);
+		}
+		else {
+			strcat(addressTextLine2, temp);
+		}
+
+	}
+}
 
 
 float getValueDs1(void) {

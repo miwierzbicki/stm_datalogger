@@ -5,3 +5,5 @@
 ../Core/Src/sd.c:89:9:sd_writeline	4
 ../Core/Src/sd.c:114:6:sd_closefile	2
 ../Core/Src/sd.c:121:13:getFresultString	21
+../Core/Src/sd.c:149:6:parseAddress	2
+../Core/Src/sd.c:158:6:readAddressFromFile	2
