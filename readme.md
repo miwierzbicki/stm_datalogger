@@ -17,6 +17,12 @@ Założeniem projektu było stworzenie konfigurowalnego, małego rejestratora da
 - Przetwornik ADC ADS1115
 - Wbudowany przetwornik ADC
 
+### Główne pliki projektu w repozytorium
+```
+\Core\src\*.c
+\Core\inc\*.h
+```
+
 ## Projekt PCB
 ![PCB](1.png)
 
