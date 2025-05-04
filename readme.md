@@ -1,6 +1,6 @@
 # STM32 µSD-Datalogger
 
-[Polski opis projektu](https://github.com/miwierzbicki/stm_datalogger/edit/dev/readme.md#pl)
+[Polski opis projektu](https://github.com/miwierzbicki/stm_datalogger/tree/dev?tab=readme-ov-file#pl)
 
 The primary objective of this project was to develop a configurable, compact measurement data logger, strictly tailored to specific user requirements.
 
