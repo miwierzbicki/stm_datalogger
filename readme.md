@@ -1,6 +1,95 @@
 # STM32 µSD-Datalogger
-## ENGLISH BELOW 
-## PL
+
+[Polski opis projektu](https://github.com/miwierzbicki/stm_datalogger/edit/dev/readme.md#pl)
+
+The primary objective of this project was to develop a configurable, compact measurement data logger, strictly tailored to specific user requirements.
+
+## Key Features:
+- Data logging capability to a microSD card.
+- Configurable sensor type and quantity.
+- Configurable reporting parameters (frequency and status/state).
+- Temperature measurement functionality.
+- Voltage measurement functionality.
+- User interface implemented via an OLED display and a rotary encoder.
+- Designed as a shield form factor for the STM32 Black Pill board.
+  
+## Components: 
+- **Microcontroller:** STM32F411CEU6 (Black Pill development board).
+- **Temperature Sensor:** Maxim DS18B20.
+- **ADC Converter:** ADS1115 (External).
+- **Internal ADC:** Utilizes the built-in ADC of the STM32F411CEU6 microcontroller.
+
+## PCB design
+![PCB](1.png)
+
+## Finished datalogger
+![Finished device](2.png)
+
+## Breakdown of the modules
+```
+- adc.c – Handles operations related to the Analog-to-Digital Converters (ADCs).
+- ds18b20.c – Handles communication with the DS18B20 temperature sensor.
+- encoder.c – Handles the rotary encoder input.
+- main.c – The main program file.
+- menu.c – Manages the menu system and user interface logic.
+- save.c – Handles the saving of measurement data.
+- sd.c – Handles SD card operations.
+```
+
+## User Interface schema
+
+![UI Schema](3.png)
+
+## Overview of UI code
+
+```c
+menu.h
+
+struct Menu {
+   ...
+};
+
+typedef struct MenuEntry {
+   ...
+MenuEntry { ... };
+
+typedef enum {
+	...
+}
+```
+
+## UI Screen flow
+![UI screens](4.png)
+
+## Measurement logic
+Interrupts are utilized to define the timing for sensor readings. Four channels are defined, each with a different sampling rate. Interrupts are generated using the microcontroller's built-in timer in Output Compare No Output mode (counting up to the value in the CCRx register). A callback function is invoked within the interrupt service routine (ISR).
+
+## Writing to a microSD card
+The FatFS file system library is used via the SPI interface, utilizing the "cubeide-sd-card" library by kiwih.
+
+Data is written through a circular buffer (100 entries) and managed by the FatFS controller to a .csv file on the microSD card.
+
+Each line in the file contains all recorded sensor data along with a timestamp from the Real-Time Clock (RTC).
+
+## Debug
+Debugging messages related to the SD card controller are implemented and output via the COM port (using a UART<->USB bridge).
+
+## Measurements / Testing
+
+###   ADC linearity measurements.
+* Voltage measurements compared against a reference standard show that the converter's response closely matches the ideal characteristic after linear fitting. This confirms good linearity across the full measurement range.
+
+###  Gain error measurement.
+* The difference between the values obtained from the analog-to-digital converter and the reference standard was calculated. This discrepancy was observed to decrease as the measured voltage decreased. Consequently, this allows for the potential development of correction functions in future enhancements to achieve better converter calibration within the desired measurement range.
+
+###   Operating time measurement under typical usage conditions.
+* Assuming a worst-case average current consumption scenario of 35 mA, the average operating time of the device was estimated when powered by a portable battery bank (power bank) with a nominal capacity of 10 Ah at a battery voltage of 3.7 V. Due to the necessary voltage conversion from the cells' 3.7 V to the required 5 V level, this power bank would have an effective capacity of approximately 7.4 Ah.
+
+* Based on these figures, it was calculated that the theoretical operating time of the device powered by the aforementioned power bank would be 102 days. This represents an ideal value and does not account for conversion losses or fluctuations in the datalogger's current draw.
+
+
+# PL 
+
 Założeniem projektu było stworzenie konfigurowalnego, małego rejestratora danych pomiarowych, dostosowanych stricte pod wymagania użytkownika. 
 
 ## Założenia:
@@ -83,80 +172,3 @@ Zaimplementowane komunikaty związane z kontrolerem SD poprzez port COM (mostek 
 - Pomiar błędu wzmocnienia
 - Pomiar czasu pracy przy typowym użytkowaniu
 
-
-# EN
-The premise of the project was to create a configurable, small measurement data logger, tailored strictly to the user's requirements. 
-
-## Assumptions:
-- Data storage on a microSD card,
-- Configurable type and number of sensors and reporting method (frequency and status) 
-- Temperature measurement
-- Voltage measurement
-- User interface via OLED and encoder
-- Form of overlay (shield) on STM32 Black pill.
-
-## Components: 
-- Microcontroller: STM32F411CEU6 type Blackpill
-- MAXIM DS18B20 temperature sensor
-- ADC converter ADS1115
-- Built-in ADC converter
-
-## PCB design
-![PCB](1.png)
-
-## Finished datalogger
-![Finished device](2.png)
-
-## Breakdown of the modules
-```
-- adc.c - instructions related to the operation of analog-to-digital     converters, 
-- ds18b20.c - instructions related to the operation of the DS18B20 thermometer, 
-- encoder.c - instructions related to the operation of the rotary encoder, 
-- main.c - main program file  
-- menu.c - instructions related to menu and user interface operation, 
-- save.c - instructions related to saving measurements, 
-- sd.c - instructions related to SD card operation. 
-```
-
-## User Interface schema
-
-![UI Schema](3.png)
-
-## Overview of UI code
-
-```c
-menu.h
-
-struct Menu {
-   ...
-};
-
-typedef struct MenuEntry {
-   ...
-MenuEntry { ... };
-
-typedef enum {
-	...
-}
-```
-
-## Passing through the interface screens
-![UI screens](4.png)
-
-## Measurement logic
-Interrupts have been used to define the timing of readings from a given sensor. Four channels are defined, each with different sampling times. Interrupts are generated using the microcontroller's built-in counter in Output Compare No Output mode (counting to the value in the CCRx register). A callback is called in the interrupt handler routine.
-
-## Writing to a microSD card
-Used FatFS file system library using itnerface SPI “cubeide-sd-card”. ~ kiwih
-
-Writing via circular buffer (100 items) and FatFS controller to .csv file on microSD card. 
-
-In each line, all the stored sensor information and the time signature from the RTC clock.
-
-## Debug
-Implemented messages related to SD controller via COM port (UART<->USB bridge).
-
-## Measurements 
-- ADC linearity measurements 
-- Gain error measurement
-- Measurement of operating time under typical use
